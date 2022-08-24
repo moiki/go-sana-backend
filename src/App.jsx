@@ -1,21 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import {useContext, useMemo, useReducer, useState} from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import Navbar from "./components/navbar/navbar";
-import Login from "./components/forms/login/login.jsx";
+import {BrowserRouter} from "react-router-dom";
 import Signup from "./components/forms/signup/signup";
+import GlobalContext, {initialState} from "./store/context.store.jsx";
+import reducer from "./store/reducer.store.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const [userState, setUserState] = useState({
+        fullName: null,
+        email: null,
+        role: [],
+        profession: null,
+        phoneNumber: null,
+    });
 
-  return (
-    <div className="App">
-        <Navbar />
-        <div className={"container"}>
-        <Signup />
-      </div>
-    </div>
-  )
+    return (
+        <GlobalContext.Provider value={{
+            state: state,
+            dispatch: dispatch,
+            user: userState,
+            setUser: (data) => {
+                setUserState({ ...userState, ...data });
+            },
+        }}>
+            <div className="App">
+                <BrowserRouter>
+                    <div className={"container"}>
+                        <Signup/>
+                    </div>
+                </BrowserRouter>
+            </div>
+        </GlobalContext.Provider>
+
+    )
 }
 
 export default App
