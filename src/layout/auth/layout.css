@@ -1,0 +1,6 @@
+.auth-layout {
+    background-image: url("../src/assets/auth_layout.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
+}
