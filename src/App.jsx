@@ -1,5 +1,5 @@
 import {useContext, useMemo, useReducer, useState} from 'react'
-import 'bootstrap/dist/css/bootstrap.min.css'
+// import 'bootstrap/dist/css/bootstrap.min.css'
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Signup from "./components/forms/signup/signup";
 import GlobalContext, {initialState} from "./store/context.store.jsx";
