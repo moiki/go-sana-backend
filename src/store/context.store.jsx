@@ -5,7 +5,7 @@ export const initialState = {
         userNavbarMini: false,
         user: null,
         viewTitle: 'Home',
-    }
+    },
 }
 
 const GlobalContext = createContext(initialState)

@@ -1,21 +1,27 @@
 import React, {useEffect} from "react";
 import {useForm} from "react-hook-form";
 import './login.css'
+import {useFreeApi} from "../../../services/auth/rest.js";
 
 export default function Login(props) {
-    const {register, handleSubmit, watch, formState: {errors}} = useForm();
-    const onSubmit = (data) => {
-        console.log(JSON.stringify(data));
+    const {register, handleSubmit, formState: {errors}} = useForm();
+    const {error, loading, executeService} = useFreeApi(
+        '/login',
+        "POST",
+    )
+    const onSubmit = async (data) => {
+        await executeService({
+            email: data.email,
+            password: data.password
+        })
     };
 
-    useEffect(() => {
-        if (errors) {
-            console.log(errors)
-        }
-    }, [errors]);
 
     return (
         <div className="Auth-form-container">
+            {error && <b className={"text-danger"}>
+                "Hubo un error al iniciar sesion."</b>}
+
             <form className="Auth-form" onSubmit={handleSubmit(onSubmit)}>
                 <div className="Auth-form-content">
                     <h3 className="Auth-form-title">Iniciar Sesión</h3>

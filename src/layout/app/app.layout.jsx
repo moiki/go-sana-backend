@@ -6,7 +6,7 @@ import {appRoutes} from "../../services/constants/routes.js";
 import {useState} from "react";
 
 const RequireAuth = ({children}) => {
-    const {user} = useAuth();
+    const {state} = useAuth();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
     const LoadContent = () => appRoutes.map((routes, index) => {
@@ -21,7 +21,7 @@ const RequireAuth = ({children}) => {
             );
         }
     })
-    if (user) {
+    if (state.user) {
         return (
             <Navigate
                 to={{pathname: "/login"}}
