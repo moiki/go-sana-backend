@@ -1,37 +1,18 @@
 import {useAuth} from "../../store/context.store.jsx";
+import {useEffect, useState} from "react";
 
 export default function Navbar() {
     const {user} = useAuth();
-    // return <nav className="navbar navbar-expand-lg sticky-top">
-    //     <div className="container-fluid">
-    //         <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
-    //                 data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false"
-    //                 aria-label="Toggle navigation">
-    //             <span className="navbar-toggler-icon"></span>
-    //         </button>
-    //         <div className="collapse navbar-collapse" id="navbarTogglerDemo01">
-    //             <a className="navbar-brand" href="#">Hidden brand</a>
-    //             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-    //                 <li className="nav-item">
-    //                     <a className="nav-link active" aria-current="page" href="#">Home</a>
-    //                 </li>
-    //                 <li className="nav-item">
-    //                     <a className="nav-link" href="#">Link</a>
-    //                 </li>
-    //                 <li className="nav-item">
-    //                     <a className="nav-link disabled">Disabled</a>
-    //                 </li>
-    //             </ul>
-    //             <form className="d-flex" role="search">
-    //                 <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-    //                 <button className="btn btn-outline-success" type="submit">Search</button>
-    //             </form>
-    //         </div>
-    //     </div>
-    // </nav>
+    const [sidebar, setSidebar] = useState(document.body.querySelector('#sidebarToggle'))
+
+    const setSide = () => {
+        const sidebarToggle = document.body;
+        sidebarToggle.classList.toggle('sb-sidenav-toggled');
+    }
+
     return <nav className="sb-topnav navbar navbar-expand navbar-light bg-light">
         <a className="navbar-brand ps-3" href="#"><b style={{fontWeight:800}}>Sana System</b></a>
-        <button className="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"><i className="fas fa-bars"></i></button>
+        <button className="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" onClick={setSide}><i className="fas fa-bars"></i></button>
         <form className="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
             <div className="input-group">
                 <input className="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch"/>

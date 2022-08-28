@@ -1,9 +1,22 @@
-import React from "react";
+import React, {useEffect} from "react";
+import {useForm} from "react-hook-form";
 import './login.css'
-export default function Login (props) {
+
+export default function Login(props) {
+    const {register, handleSubmit, watch, formState: {errors}} = useForm();
+    const onSubmit = (data) => {
+        console.log(JSON.stringify(data));
+    };
+
+    useEffect(() => {
+        if (errors) {
+            console.log(errors)
+        }
+    }, [errors]);
+
     return (
         <div className="Auth-form-container">
-            <form className="Auth-form">
+            <form className="Auth-form" onSubmit={handleSubmit(onSubmit)}>
                 <div className="Auth-form-content">
                     <h3 className="Auth-form-title">Iniciar Sesión</h3>
                     <div className="form-group mt-3">
@@ -11,16 +24,29 @@ export default function Login (props) {
                         <input
                             type="email"
                             className="form-control mt-1"
-                            placeholder="Enter email"
+                            placeholder="Escriba su correo electrónico"
+                            {...register("email", {required: true, pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i})}
                         />
+                        <small>
+                            <b className={"text-danger"}>
+                                {errors.email?.type === 'pattern' && "Email incorrecto"}
+                                {errors.email?.type === 'required' && "Email es requerido."}
+                            </b>
+                        </small>
                     </div>
                     <div className="form-group mt-3">
                         <label>Contraseña</label>
                         <input
                             type="password"
                             className="form-control mt-1"
-                            placeholder="Enter password"
+                            placeholder="Escriba su contraseña"
+                            {...register("password", {required: true})}
                         />
+                        <small>
+                            <b className={"text-danger"}>
+                                {errors.password?.type === 'required' && "La contraseña es requerida."}
+                            </b>
+                        </small>
                     </div>
                     <div className="d-grid gap-2 mt-3">
                         <button type="submit" className="btn btn-primary">
@@ -28,7 +54,7 @@ export default function Login (props) {
                         </button>
                     </div>
                     <p className="forgot-password text-right mt-2">
-                         <a href="#">¿Has olvidado tu contraseña?</a>
+                        <a href="#">¿Has olvidado tu contraseña?</a>
                     </p>
                 </div>
             </form>
