@@ -29,7 +29,7 @@ export const verifyTokenLogin = async () => {
     // alert(JSON.stringify(TOKEN))
     return await axios
         .post(
-            config.rest_uri + '/user/refreshToken',
+            config.rest_uri_dev + '/refreshToken',
             {token: TOKEN},
             {
                 headers: {

@@ -1,5 +1,3 @@
-import dotenv from "dotenv"
-dotenv.config()
 
 export default {
     rest_uri_prod: import.meta.env.VITE_REACT_APP_REST_PROD_URL,
