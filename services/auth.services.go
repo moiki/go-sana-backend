@@ -52,6 +52,10 @@ func Login(data Credentials) (string, error) {
 	return token, nil
 }
 
+func Me(email string) (models.User, error) {
+	return connections.FindOneByEmail(email, collection)
+}
+
 func RefreshToken(token string) (string, error) {
 	err := utils.ValidateToken(token)
 	if err != nil {

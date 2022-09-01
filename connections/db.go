@@ -69,3 +69,12 @@ func InsertOne(data interface{}, coll *mongo.Collection) error {
 	_, err := coll.InsertOne(ctx, data)
 	return err
 }
+
+func FindOneByEmail(email string, coll *mongo.Collection) (models.User, error) {
+	var user models.User
+	err := coll.FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}

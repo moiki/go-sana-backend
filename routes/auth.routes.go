@@ -3,6 +3,8 @@ package routes
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
+	"go-sana-blackend/middlewares"
 	"go-sana-blackend/services"
 	"go-sana-blackend/utils"
 )
@@ -15,6 +17,7 @@ func Login(ctx *fiber.Ctx) error {
 		})
 		return nil
 	}
+
 	token, error := services.Login(credentials)
 	if error != nil {
 		ctx.Status(400).JSON(&fiber.Map{
@@ -41,7 +44,22 @@ func RefreshToken(ctx *fiber.Ctx) error {
 	return nil
 }
 
+func Me(ctx *fiber.Ctx) error {
+	_user := ctx.Locals("user").(*jwt.Token)
+	claims := _user.Claims.(jwt.MapClaims)
+	//ctx.Context().
+	user, err := services.Me(claims["email"].(string))
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+		return nil
+	}
+	ctx.JSON(user)
+	return nil
+}
+
 func AuthRoutes(app fiber.Router) {
 	app.Post("/login", Login)
+	app.Get("/me", middlewares.JWTProtected(), Me)
 	app.Post("/refreshToken", RefreshToken)
 }

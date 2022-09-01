@@ -26,19 +26,16 @@ func GenerateJWT(
 	id string,
 	userType string) (tokenString string, err error) {
 	//expirationTime := time.Now().Add(1 * time.Hour)
-	claims := &SignedDetails{
-		Email:    email,
-		name:     fmt.Sprintf("%s %s", fn, ln),
-		Uid:      id,
-		UserType: userType,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Minute)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
-		},
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["email"] = email
+	claims["name"] = fmt.Sprintf("%s %s", fn, ln)
+	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+	newToken, err := token.SignedString([]byte(EnvData.SkKey))
+	if err != nil {
+		return "", err
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(EnvData.SkKey))
+	return newToken, nil
 }
 
 func GenerateRefreshJWT(email string) (string, error) {
@@ -55,7 +52,7 @@ func GenerateRefreshJWT(email string) (string, error) {
 func ValidateToken(signedToken string) (err error) {
 	token, err := jwt.ParseWithClaims(
 		signedToken,
-		&SignedDetails{},
+		&jwt.MapClaims{},
 		func(token *jwt.Token) (interface{}, error) {
 			return []byte(EnvData.SkKey), nil
 		},
@@ -63,15 +60,16 @@ func ValidateToken(signedToken string) (err error) {
 	if err != nil {
 		return nil
 	}
-	claims, ok := token.Claims.(*SignedDetails)
+	_, ok := token.Claims.(*jwt.MapClaims)
 	if !ok {
 		err = errors.New("couldn't parse claims")
 		return err
 	}
-	if claims.ExpiresAt.Unix() < time.Now().Local().Unix() {
-		err = errors.New("token expired")
-		return err
-	}
+
+	//if claims["exp"] < time.Now().Local().Unix() {
+	//	err = errors.New("token expired")
+	//	return err
+	//}
 	return nil
 }
 
