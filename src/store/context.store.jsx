@@ -1,11 +1,8 @@
 import React, {createContext, useContext} from 'react'
 
 export const initialState = {
-    state: {
-        userNavbarMini: false,
-        user: null,
-        viewTitle: 'Home',
-    },
+    state: null,
+    dispatch: ()=> {}
 }
 
 const GlobalContext = createContext(initialState)

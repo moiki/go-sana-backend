@@ -1,45 +1,20 @@
-import {useAuth} from "../../store/context.store.jsx";
-import {Navigate, Outlet, Route, useLocation} from "react-router-dom";
+import GlobalContext, {useAuth} from "../../store/context.store.jsx";
+import {Navigate, Outlet, Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import Navbar from "../../components/navbar/navbar";
 import Sidenav from "../../components/sidenav/sidenav";
 import {appRoutes} from "../../services/constants/routes.js";
-import {useEffect, useState} from "react";
-import Lottie from "react-lottie";
-import loadingJSON from "../../assets/JSON/cargando.json"
+import {useContext, useEffect, useState} from "react";
 import {useAuthorizedApi} from "../../services/auth/rest.js";
 import actionsStore from "../../store/actions.store.jsx";
-
-const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: loadingJSON,
-    rendererSettings: {
-        preserveAspectRatio: "xMidYMid slice",
-    },
-};
+import LoadingScreen from "../../components/loadings/loadingScreen";
 
 const RequireAuth = ({children}) => {
-    const {state, dispatch} = useAuth();
+    const {state} = useContext(GlobalContext);
     const location = useLocation();
-    const [loading, setLoading] = useState(true);
+    const hist = useNavigate();
 
-    const {data, error, loading: exLoading} = useAuthorizedApi({
-        url: "/me",
-        automatic: true
-    });
-
-    useEffect(() => {
-       if (data) {
-           dispatch({
-               type: actionsStore.SET_LOGGED_USER,
-               payload: data
-           })
-           setLoading(false)
-       }
-    }, [data]);
-
-
-    const LoadContent = () => appRoutes.map((routes, index) => {
+    const LoadContent = () =>  appRoutes.map((routes, index) => {
+        console.log(routes.layout)
         if (routes.layout === "admin") {
             return (
                 <Route
@@ -51,7 +26,13 @@ const RequireAuth = ({children}) => {
             );
         }
     })
-    if (state.user) {
+    // useEffect(() => {
+    //    if (state.user) {
+    //        console.log("logged...")
+    //    }
+    // }, [state.user]);
+
+    if (!state.user) {
         return (
             <Navigate
                 to={{pathname: "/login"}}
@@ -61,15 +42,10 @@ const RequireAuth = ({children}) => {
         );
     }
 
-    return loading ?
-        (<div className={"d-flex justify-content-center align-items-center"} style={{height:"100vh"}}>
-        <div className={""}>
-            <Lottie options={defaultOptions} height={300} width={300} />
-        </div>
-    </div>) : <>{LoadContent()}</>;
+    return <>{LoadContent()}</>;
 };
 
-export default function AppLayout() {
+function AppLayoutContainer() {
     return <RequireAuth>
         <Navbar/>
         <Sidenav>
@@ -79,4 +55,36 @@ export default function AppLayout() {
         </Sidenav>
 
     </RequireAuth>
+}
+
+export default function AppLayout() {
+    const {dispatch} = useContext(GlobalContext);
+    const [loading, setLoading] = useState(true);
+    const {data, error} = useAuthorizedApi({
+        url: "/me",
+        automatic: true
+    });
+
+    useEffect(() => {
+        if (data) {
+            dispatch({
+                type: actionsStore.SET_LOGGED_USER,
+                payload: data
+            })
+        }
+        if (error) {
+            console.log("error is: ", error)
+            dispatch({
+                type: actionsStore.SET_INITIAL_STATE,
+            })
+            setLoading(false)
+        }
+        // console.log(user)
+
+    }, [data, loading]);
+
+    if (loading===false) {
+        return <AppLayoutContainer/>
+    }
+    return <LoadingScreen verifyOff={()=>setLoading(false)}/>
 }

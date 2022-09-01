@@ -13,7 +13,6 @@ export default function Login(props) {
         "POST",
         {
             onSuccess: ({data}) => {
-                console.log(data)
                 localStorage.setItem("token", data.token);
                     navigate("/admin")
             },

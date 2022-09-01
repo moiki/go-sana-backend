@@ -9,7 +9,7 @@ export default function reducer (state = initialState, action) {
         case actionsStore.SET_LOGGED_USER: {
             return {
                 ...state,
-                user: action.payload
+                state: {user: action.payload}
             }
         }
         case actionsStore.SET_HISTORY: {

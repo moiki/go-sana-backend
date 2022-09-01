@@ -24,6 +24,6 @@ export const appRoutes = [
         name: 'home',
         mini: 'H',
         component: HomeView,
-        layout: '/auth',
+        layout: 'admin',
     },
 ]

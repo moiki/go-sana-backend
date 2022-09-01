@@ -82,8 +82,8 @@ export const useAuthorizedApi = ({
     const { state, dispatch } = useAuth()
     const hist = useNavigate();
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState(null);
 
     const executeService = async (body = {}) => {
         try {
@@ -98,7 +98,6 @@ export const useAuthorizedApi = ({
                     headers: {
                         'Content-Type': contentType,
                         Authorization: 'Bearer ' + TOKEN,
-                        ...importHeaders(),
                     },
                 });
 
@@ -117,10 +116,6 @@ export const useAuthorizedApi = ({
                         data: body,
                         headers: {
                             'Content-Type': contentType,
-                            'client-ip': localStorage.getItem('client-ip') || '',
-                            'client-browser': localStorage.getItem('client-browser') || '',
-                            'client-country': '',
-                            'client-os': localStorage.getItem('client-os') || '',
                             Authorization: 'Bearer ' + TOKEN,
                         },
                     });
@@ -132,6 +127,7 @@ export const useAuthorizedApi = ({
                     }
                 } else {
                     // CancelRequest();
+                    setLoading(false);
                     dispatch({ type: actionsStore.SET_INITIAL_STATE });
                     logout(hist);
                 }
@@ -161,7 +157,7 @@ export const useAuthorizedApi = ({
 
     useEffect(() => {
         if (automatic) {
-            executeService().then();
+            executeService()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
