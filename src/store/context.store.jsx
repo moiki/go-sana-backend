@@ -1,7 +1,7 @@
 import React, {createContext, useContext} from 'react'
 
 export const initialState = {
-    state: null,
+    user: null,
     dispatch: ()=> {}
 }
 

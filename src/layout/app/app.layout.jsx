@@ -1,36 +1,34 @@
+import React, {useContext, useEffect, useState} from "react";
 import GlobalContext, {useAuth} from "../../store/context.store.jsx";
 import {Navigate, Outlet, Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import Navbar from "../../components/navbar/navbar";
 import Sidenav from "../../components/sidenav/sidenav";
 import {appRoutes} from "../../services/constants/routes.js";
-import {useContext, useEffect, useState} from "react";
 import {useAuthorizedApi} from "../../services/auth/rest.js";
 import actionsStore from "../../store/actions.store.jsx";
 import LoadingScreen from "../../components/loadings/loadingScreen";
+import HomeView from "../../views/homeView/index.jsx";
+
+export const LoadContent = () => appRoutes.map((routes, index) => {
+    console.log(routes.layout, index)
+    if (routes.layout === "admin") {
+        if (routes.isIndex) {
+            return <Route index element={React.createElement(routes.component)} exact/>
+        }
+        return (
+            <Route
+                key={index}
+                path={`${routes.path}`}
+                component={React.createElement(routes.component)}
+                exact
+            />
+        );
+    }
+})
 
 const RequireAuth = ({children}) => {
     const {state} = useContext(GlobalContext);
     const location = useLocation();
-    const hist = useNavigate();
-
-    const LoadContent = () =>  appRoutes.map((routes, index) => {
-        console.log(routes.layout)
-        if (routes.layout === "admin") {
-            return (
-                <Route
-                    key={index}
-                    path={`/admin/${routes.path}`}
-                    component={routes.component}
-                    exact
-                />
-            );
-        }
-    })
-    // useEffect(() => {
-    //    if (state.user) {
-    //        console.log("logged...")
-    //    }
-    // }, [state.user]);
 
     if (!state.user) {
         return (
@@ -42,27 +40,21 @@ const RequireAuth = ({children}) => {
         );
     }
 
-    return <>{LoadContent()}</>;
+    return <>{children}</>
 };
 
-function AppLayoutContainer() {
-    return <RequireAuth>
-        <Navbar/>
-        <Sidenav>
-            <main className={"container-fluid"}>
-                <Outlet/>
-            </main>
-        </Sidenav>
 
-    </RequireAuth>
-}
 
 export default function AppLayout() {
     const {dispatch} = useContext(GlobalContext);
     const [loading, setLoading] = useState(true);
+    const hist = useNavigate()
     const {data, error} = useAuthorizedApi({
         url: "/me",
-        automatic: true
+        automatic: true,
+        onError: () => {
+            hist("/login")
+        }
     });
 
     useEffect(() => {
@@ -83,8 +75,15 @@ export default function AppLayout() {
 
     }, [data, loading]);
 
-    if (loading===false) {
-        return <AppLayoutContainer/>
+    if (loading === false) {
+        return <RequireAuth>
+            <Navbar/>
+            <Sidenav>
+                <main className={"container-fluid"}>
+                    <Outlet/>
+                </main>
+            </Sidenav>
+        </RequireAuth>
     }
-    return <LoadingScreen verifyOff={()=>setLoading(false)}/>
+    return <LoadingScreen verifyOff={() => setLoading(false)}/>
 }

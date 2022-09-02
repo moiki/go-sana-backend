@@ -22,6 +22,7 @@ export const appRoutes = [
     {
         path: '/',
         name: 'home',
+        isIndex: true,
         mini: 'H',
         component: HomeView,
         layout: 'admin',
