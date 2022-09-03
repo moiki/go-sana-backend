@@ -5,11 +5,12 @@ import Signup from "./components/forms/signup/signup";
 import GlobalContext, {initialState} from "./store/context.store.jsx";
 import reducer from "./store/reducer.store.jsx";
 import AuthLayout from "./layout/auth/auth.layout";
-import Login from "./components/forms/login/login";
+import Login from "./layout/auth/Login.auth.jsx";
 // import {createBrowserHistory} from "history";
 import AppLayout, {LoadContent} from "./layout/app/app.layout";
-import HomeView from "./views/homeView";
-
+import "antd/dist/antd.css";
+import "./assets/styles/main.styles.css";
+import "./assets/styles/responsive.styles.css";
 // export const hist = createBrowserHistory();
 
 function init(state) {
@@ -26,8 +27,8 @@ function App() {
         }}>
                 <BrowserRouter>
                     <Routes>
+                        <Route path="login" element={<Login/>}/>
                         <Route element={<AuthLayout/>}>
-                            <Route path="login" element={<Login/>}/>
                             <Route path="signup" element={<Signup/>}/>
                         </Route>
                         <Route path={"admin"} element={<AppLayout/>}>

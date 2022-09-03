@@ -7,7 +7,7 @@ import {appRoutes} from "../../services/constants/routes.js";
 import {useAuthorizedApi} from "../../services/auth/rest.js";
 import actionsStore from "../../store/actions.store.jsx";
 import LoadingScreen from "../../components/loadings/loadingScreen";
-import HomeView from "../../views/homeView/index.jsx";
+import MainLayout from "./Main.layout";
 
 export const LoadContent = () => appRoutes.map((routes, index) => {
     console.log(routes.layout, index)
@@ -77,12 +77,9 @@ export default function AppLayout() {
 
     if (loading === false) {
         return <RequireAuth>
-            <Navbar/>
-            <Sidenav>
-                <main className={"container-fluid"}>
+                <MainLayout className={"container-fluid"}>
                     <Outlet/>
-                </main>
-            </Sidenav>
+                </MainLayout>
         </RequireAuth>
     }
     return <LoadingScreen verifyOff={() => setLoading(false)}/>

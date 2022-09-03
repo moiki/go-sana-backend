@@ -2,7 +2,7 @@ export const DEFAULT_VIEW_ADMIN = '/admin';
 export const DEFAULT_VIEW_LOG = '/login';
 
 export const logout = history => {
-    history.push(DEFAULT_VIEW_LOG)
+    history(DEFAULT_VIEW_LOG)
     localStorage.removeItem('token')
     localStorage.removeItem('refreshToken')
 }
