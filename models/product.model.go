@@ -18,6 +18,9 @@ var ProductIndex = []mongo.IndexModel{
 		Options: options.Index().SetUnique(true),
 	},
 	{
+		Keys: bson.D{{"lote", -1}},
+	},
+	{
 		Keys: bson.D{{"created_at", -1}},
 	},
 }
@@ -27,8 +30,9 @@ type Product struct {
 	LaboratoryId string    `json:"laboratory_id,omitempty" bson:"laboratory_id"`
 	Name         string    `json:"name,omitempty" bson:"name"`
 	ProductCode  string    `json:"product_code,omitempty" bson:"product_code"`
-	Price        float32   `json:"price,omitempty" bson:"price"`
+	Price        float64   `json:"price,omitempty" bson:"price"`
 	image        string    `json:"image,omitempty" bson:"image"`
+	Lote         int64     `json:"lote,omitempty" bson:"lote"`
 	IsActive     bool      `json:"is_active,omitempty" bson:"is_active"`
 	CreatedAt    time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at" bson:"updated_at"`
