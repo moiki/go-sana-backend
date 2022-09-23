@@ -10,16 +10,15 @@ import LoadingScreen from "../../components/loadings/loadingScreen";
 import MainLayout from "./Main.layout";
 
 export const LoadContent = () => appRoutes.map((routes, index) => {
-    console.log(routes.layout, index)
     if (routes.layout === "admin") {
         if (routes.isIndex) {
-            return <Route index element={React.createElement(routes.component)} exact/>
+            return <Route key={index} index element={React.createElement(routes.component)} exact/>
         }
         return (
             <Route
                 key={index}
                 path={`${routes.path}`}
-                component={React.createElement(routes.component)}
+                element={React.createElement(routes.component)}
                 exact
             />
         );

@@ -6,6 +6,7 @@ import {
 import signinbg from "../../assets/login-image.jpg";
 import {useForm} from "react-hook-form";
 import {useFreeApi} from "../../services/auth/rest.js";
+import {PulseLoader} from "react-spinners";
 
 function onChange(checked) {
     console.log(`switch to ${checked}`);
@@ -37,7 +38,7 @@ export default function SignIn() {
         console.log("Failed:", errorInfo);
     };
     return (<>
-        <Layout className="layout-default layout-signin">
+        <Layout className="layout-default layout-signin" style={{height: "100vh"}}>
             <Content className="signin">
                 <Row gutter={[24, 0]} justify="space-around">
                     <Col
@@ -45,7 +46,9 @@ export default function SignIn() {
                         lg={{span: 6, offset: 2}}
                         md={{span: 12}}
                     >
-                        <Title className="mb-15">Sign In</Title>
+                        <Title className="mb-15">Iniciar Sesión</Title>
+                        {error && <b className={"text-danger"}>
+                            "Hubo un error al iniciar sesion."</b>}
                         <Title className="font-regular text-muted" level={5}>
                             Ingrese su correo y constraseña para iniciar sesión
                         </Title>
@@ -65,34 +68,26 @@ export default function SignIn() {
                             >
                                 <Input placeholder="Email"/>
                             </Form.Item>
-
                             <Form.Item
-                                className="username"
                                 label="Contraseña"
                                 name="password"
                                 rules={[{
                                     required: true, message: "Please input your password!",
                                 },]}
                             >
-                                <Input placeholder="Password"/>
+                                <Input.Password placeholder="Password"/>
                             </Form.Item>
-
-                            <Form.Item
-                                name="remember"
-                                className="aligin-center"
-                                valuePropName="checked"
-                            >
-                                <Switch defaultChecked onChange={onChange}/>
-                                Remember me
-                            </Form.Item>
-
                             <Form.Item>
                                 <Button
                                     type="primary"
                                     htmlType="submit"
                                     style={{width: "100%"}}
                                 >
-                                    INICIAR SESIÓN
+                                    {
+                                        loading === true ?
+                                            <PulseLoader color={"white"} loading/>
+                                            : "INICIAR SESION"
+                                    }
                                 </Button>
                             </Form.Item>
                             <p className="font-semibold text-muted">

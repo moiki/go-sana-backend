@@ -1,5 +1,7 @@
 import Login from "../../components/forms/login/login.jsx";
 import HomeView from "../../views/homeView/index.jsx";
+import InventarioView from "../../views/inventatio/index.jsx";
+import CreateProduct from "../../views/inventatio/createProduct.jsx";
 
 export const authRoutes = [
     {
@@ -25,6 +27,22 @@ export const appRoutes = [
         isIndex: true,
         mini: 'H',
         component: HomeView,
+        layout: 'admin',
+    },
+    {
+        path: 'inventario',
+        name: 'Inventario',
+        isIndex: false,
+        mini: 'H',
+        component: InventarioView,
+        layout: 'admin',
+    },
+    {
+        path: 'inventario/crear',
+        name: 'Crear Producto',
+        isIndex: false,
+        mini: 'H',
+        component: CreateProduct,
         layout: 'admin',
     },
 ]

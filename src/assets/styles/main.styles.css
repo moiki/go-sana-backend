@@ -7,7 +7,8 @@ body {
     font-size: 14px;
     line-height: 1.6;
     font-weight: 400;
-    font-family: open sans, Helvetica, Arial, sans-serif;
+    font-family: 'Roboto Condensed', sans-serif;
+    /*font-family: open sans, Helvetica, Arial, sans-serif;*/
 }
 
 .ant-layout.ant-layout-has-sider {
@@ -1600,7 +1601,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light.left-nav li:active {
 }
 
 .rightside-top .ant-input {
-    height: 30px;
+    height: auto;
 }
 
 .aside-footer {
@@ -2060,7 +2061,7 @@ body {
 }
 
 .ant-input {
-    border-radius: 6px;
+    /*border-radius: 6px;*/
 }
 
 .ant-input {
@@ -2069,16 +2070,24 @@ body {
 }
 
 .ant-input {
-    height: 40px;
+    height: 50px;
     border: 1px solid #d9d9d9;
 }
-
+.password {
+    height: 40px;
+    display: block;
+    margin-bottom: 40px;
+}
 .font-bold {
     font-weight: 700;
 }
 
 .text-dark {
     color: #141414;
+}
+
+.ant-input-affix-wrapper {
+    padding: 0px 10px 0px 10px;
 }
 
 .ant-btn,

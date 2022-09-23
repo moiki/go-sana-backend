@@ -289,7 +289,7 @@ function Header({
                 className="ant-page-header-heading-title"
                 style={{textTransform: "capitalize"}}
             >
-              {subName.replace("/", "")}
+              {subName.split("/")[subName.split("/").length - 1]}
             </span>
                     </div>
                 </Col>
