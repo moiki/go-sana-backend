@@ -16,6 +16,10 @@ func main() {
 	app.Use(logger.New())
 	//app.Use(csrf.New())
 	connections.DefaultUser()
+	app.Get("/active", func(ctx *fiber.Ctx) error {
+		ctx.Status(fiber.StatusOK).SendString("I am running!</h1>")
+		return nil
+	})
 	api := app.Group("/api/v1")
 	routes.AuthRoutes(api)
 	routes.InventoryRoutes(api)
