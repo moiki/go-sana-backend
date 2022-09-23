@@ -1,12 +1,13 @@
 [
   {
+    "$match": {
+      "is_active": true
+    }
+  },
+  {
     "$facet": {
       "totalDocs": [
-        {
-          "$match": {
-            "is_active": true
-          }
-        },
+
         {
           "$group": {
             "_id": null,
@@ -23,11 +24,6 @@
         }
       ],
       "docs": [
-        {
-          "$match": {
-            "is_active": true
-          }
-        },
         {
           "$project": {
             "_id": 0

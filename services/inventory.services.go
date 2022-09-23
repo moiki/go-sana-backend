@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go-sana-blackend/connections"
 	"go-sana-blackend/models"
-	"go-sana-blackend/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	//"go-sana-blackend/models"
@@ -13,10 +12,80 @@ import (
 
 var ProductCollection = connections.GetCollection("products", connections.IndexOptions{HasIndex: false})
 
+func ListProductPipeline(perPage int16, page int16) []bson.D {
+	var result []bson.D
+
+	pipe := []bson.M{
+		{
+			"$match": bson.M{
+				"is_active": true,
+			},
+		},
+		{
+			"$facet": bson.M{
+				"totalDocs": bson.A{
+					bson.M{
+						"$group": bson.M{
+							"_id": nil,
+							"count": bson.M{
+								"$sum": 1,
+							},
+						},
+					},
+					bson.M{
+						"$project": bson.M{
+							"_id":   0,
+							"count": 1,
+						},
+					},
+				},
+				"docs": bson.A{
+					bson.M{
+						"$skip": perPage * (page - 1),
+					},
+					bson.M{
+						"$limit": perPage,
+					},
+					bson.M{
+						"$project": bson.M{
+							"_id": 0,
+						},
+					},
+				},
+			},
+		},
+		{
+			"$unwind": "$totalDocs",
+		},
+		{
+			"$project": bson.M{
+				"total": "$totalDocs.count",
+				"docs":  1,
+			},
+		},
+	}
+	for _, stage := range pipe {
+		var convertedStage bson.D
+		newStage, err := bson.Marshal(stage)
+		if err != nil {
+			println("IN MARSHAL")
+			panic(err.Error())
+		}
+		if bsonErr := bson.Unmarshal(newStage, &convertedStage); bsonErr != nil {
+			println("IN UN-MARSHAL")
+			panic(bsonErr.Error())
+		}
+		result = append(result, convertedStage)
+	}
+
+	return result
+}
+
 func ListProducts(perPage int16, page int16) ([]bson.M, error) {
 	var productsTable []bson.M
-	ListPipeline := utils.GeneratePipelineFromJSON("./json/aggregations/listProducts.json")
-	//fmt.Println(ListPipeline)
+
+	ListPipeline := ListProductPipeline(perPage, page)
+	fmt.Println(ListPipeline)
 	data, err := ProductCollection.Aggregate(connections.DbCtx, mongo.Pipeline(ListPipeline))
 	if err != nil {
 		fmt.Println("aggregate error: ", err)

@@ -9,12 +9,13 @@ import (
 )
 
 func GetProductList(ctx *fiber.Ctx) error {
-	products, err := services.ListProducts(1, 10)
+	products, err := services.ListProducts(10, 1)
 	if err != nil {
 		fmt.Println(err.Error())
 		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
 		return nil
 	}
+	//fmt.Println(products)
 	ctx.JSON(fiber.Map{"data": products})
 	return nil
 }
