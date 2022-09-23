@@ -5,17 +5,19 @@ import (
 	"time"
 )
 
-type Lote struct {
-	LoteId     string       `json:"lote_id,omitempty" bson:"lote_id"`
-	Number     int64        `json:"number,omitempty" bson:"number"`
-	LoteDetail []LoteDetail `json:"lote_detail,omitempty" bson:"lote_detail"`
-	CreatedAt  time.Time    `json:"created_at" bson:"created_at"`
+type Lot struct {
+	LotId        string      `json:"lot_id,omitempty" bson:"lot_id"`
+	Number       int64       `json:"number,omitempty" bson:"number"`
+	LotDetail    []LotDetail `json:"lot_detail,omitempty" bson:"lot_detail"`
+	CreatedAt    time.Time   `json:"created_at" bson:"created_at"`
+	PurchaseDate time.Time   `json:"purchase_date" bson:"purchase_date"`
 }
 
-type LoteDetail struct {
-	ProductId  string  `json:"product_id,omitempty" bson:"product_id"`
-	quantity   int64   `json:"quantity,omitempty" bson:"quantity"`
-	totalPrice float64 `json:"total_price,omitempty" bson:"total_price"`
+type LotDetail struct {
+	ProductId  string    `json:"product_id,omitempty" bson:"product_id"`
+	Quantity   int64     `json:"quantity,omitempty" bson:"quantity"`
+	TotalPrice float64   `json:"total_price,omitempty" bson:"total_price"`
+	CreatedAt  time.Time `json:"created_at" bson:"created_at"`
 }
 
 type Refund struct {
@@ -25,10 +27,13 @@ type Refund struct {
 	CreatedAt time.Time `json:"created_at" bson:"created_at"`
 }
 
-func (l Lote) NewLote() Lote {
-	l.LoteId = uuid.New().String()
+func (l Lot) NewLot() Lot {
+	l.LotId = uuid.New().String()
 	if l.CreatedAt.IsZero() {
 		l.CreatedAt = time.Now()
+	}
+	if l.PurchaseDate.IsZero() {
+		l.PurchaseDate = time.Now()
 	}
 	return l
 }

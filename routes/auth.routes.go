@@ -18,10 +18,10 @@ func Login(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	token, error := services.Login(credentials)
-	if error != nil {
+	token, _error := services.Login(credentials)
+	if _error != nil {
 		ctx.Status(400).JSON(&fiber.Map{
-			"error": error.Error(),
+			"error": _error.Error(),
 		})
 		return nil
 	}

@@ -16,7 +16,8 @@ var (
 	port = 27017
 )
 var collection *mongo.Collection
-var ctx = context.TODO()
+var DbCtx = context.TODO()
+var MongoCtx = context.Background()
 
 type IndexOptions struct {
 	HasIndex bool
@@ -28,7 +29,7 @@ func EnsureIndex(cd *mongo.Collection, indexes []mongo.IndexModel) error {
 
 	opts := options.CreateIndexes()
 
-	_indexes, err := cd.Indexes().CreateMany(ctx, indexes, opts)
+	_indexes, err := cd.Indexes().CreateMany(DbCtx, indexes, opts)
 	if err != nil {
 		fmt.Printf("error while executing index Query %s\n", err.Error())
 		return err
@@ -40,7 +41,7 @@ func EnsureIndex(cd *mongo.Collection, indexes []mongo.IndexModel) error {
 func GetCollection(name string, indexOptions IndexOptions) *mongo.Collection {
 
 	clientOpts := options.Client().ApplyURI(utils.EnvData.MongoUri)
-	client, err := mongo.Connect(ctx, clientOpts)
+	client, err := mongo.Connect(DbCtx, clientOpts)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,26 +54,26 @@ func GetCollection(name string, indexOptions IndexOptions) *mongo.Collection {
 
 func DefaultUser() {
 	coll := GetCollection("snUsers", IndexOptions{HasIndex: true, Indexes: models.UserIndex})
-	count, err := coll.CountDocuments(ctx, bson.M{"email": utils.EnvData.DefaultUser})
+	count, err := coll.CountDocuments(DbCtx, bson.M{"email": utils.EnvData.DefaultUser})
 	if err != nil {
 		panic(err.Error())
 		return
 	}
 	if count == 0 {
 		user := models.NewUser(true)
-		coll.InsertOne(ctx, user)
+		coll.InsertOne(DbCtx, user)
 	}
 	return
 }
 
 func InsertOne(data interface{}, coll *mongo.Collection) error {
-	_, err := coll.InsertOne(ctx, data)
+	_, err := coll.InsertOne(DbCtx, data)
 	return err
 }
 
 func FindOneByEmail(email string, coll *mongo.Collection) (models.User, error) {
 	var user models.User
-	err := coll.FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	err := coll.FindOne(DbCtx, bson.M{"email": email}).Decode(&user)
 	if err != nil {
 		return user, err
 	}

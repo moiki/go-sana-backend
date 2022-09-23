@@ -1,0 +1,48 @@
+[
+  {
+    "$facet": {
+      "totalDocs": [
+        {
+          "$match": {
+            "is_active": true
+          }
+        },
+        {
+          "$group": {
+            "_id": null,
+            "count": {
+              "$sum": 1
+            }
+          }
+        },
+        {
+          "$project": {
+            "_id": 0,
+            "count": 1
+          }
+        }
+      ],
+      "docs": [
+        {
+          "$match": {
+            "is_active": true
+          }
+        },
+        {
+          "$project": {
+            "_id": 0
+          }
+        }
+      ]
+    }
+  },
+  {
+    "$unwind": "$totalDocs"
+  },
+  {
+    "$project": {
+      "total": "$totalDocs.count",
+      "docs": 1
+    }
+  }
+]

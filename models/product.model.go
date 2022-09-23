@@ -26,16 +26,18 @@ var ProductIndex = []mongo.IndexModel{
 }
 
 type Product struct {
-	ProductId    string    `json:"product_id,omitempty" bson:"product_id"`
-	LaboratoryId string    `json:"laboratory_id,omitempty" bson:"laboratory_id"`
-	Name         string    `json:"name,omitempty" bson:"name"`
-	ProductCode  string    `json:"product_code,omitempty" bson:"product_code"`
-	Price        float64   `json:"price,omitempty" bson:"price"`
-	image        string    `json:"image,omitempty" bson:"image"`
-	Lote         int64     `json:"lote,omitempty" bson:"lote"`
-	IsActive     bool      `json:"is_active,omitempty" bson:"is_active"`
-	CreatedAt    time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at" bson:"updated_at"`
+	ProductId             string    `json:"product_id,omitempty" bson:"product_id"`
+	LaboratoryId          string    `json:"laboratory_id,omitempty" bson:"laboratory_id"`
+	ProductPresentationId string    `bson:"product_presentation_id,omitempty" bson:"product_presentation_id"`
+	Name                  string    `json:"name,omitempty" bson:"name"`
+	ProductCode           string    `json:"product_code,omitempty" bson:"product_code"`
+	Price                 float64   `json:"price,omitempty" bson:"price"`
+	Image                 string    `json:"image,omitempty" bson:"image"`
+	Lot                   int64     `json:"lot,omitempty" bson:"lot"`
+	Quantity              int64     `json:"quantity,omitempty" bson:"quantity"`
+	IsActive              bool      `json:"is_active,omitempty" bson:"is_active"`
+	CreatedAt             time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at" bson:"updated_at"`
 }
 
 func (p Product) NewProduct() Product {

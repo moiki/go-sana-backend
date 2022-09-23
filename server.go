@@ -18,6 +18,7 @@ func main() {
 	connections.DefaultUser()
 	api := app.Group("/api/v1")
 	routes.AuthRoutes(api)
+	routes.InventoryRoutes(api)
 	app.Listen(":" + utils.EnvData.Port)
 	fmt.Println("Server is running on http://localhost:9000")
 }
