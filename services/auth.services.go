@@ -1,7 +1,6 @@
 package services
 
 import (
-	"context"
 	"fmt"
 	"go-sana-blackend/connections"
 	"go-sana-blackend/models"
@@ -11,7 +10,6 @@ import (
 
 var collection = connections.GetCollection("snUsers", connections.IndexOptions{HasIndex: true, Indexes: models.UserIndex})
 var sessionCollection = connections.GetCollection("snSessions", connections.IndexOptions{HasIndex: false})
-var ctx = context.Background()
 
 type Credentials struct {
 	Email    string `json:"email,omitempty"`
@@ -22,7 +20,7 @@ func Login(data Credentials) (string, error) {
 	var user models.User
 	m := models.Session{}
 	session := m.NewSession()
-	errFind := collection.FindOne(ctx, bson.M{"email": data.Email}).Decode(&user)
+	errFind := collection.FindOne(connections.MongoCtx, bson.M{"email": data.Email}).Decode(&user)
 	if errFind != nil {
 		return "", errFind
 	}
@@ -50,6 +48,10 @@ func Login(data Credentials) (string, error) {
 		return "", errSession
 	}
 	return token, nil
+}
+
+func Me(email string) (models.User, error) {
+	return connections.FindOneByEmail(email, collection)
 }
 
 func RefreshToken(token string) (string, error) {

@@ -1,0 +1,12 @@
+[
+  {
+    "$match": {
+      "is_active": true
+    }
+  },
+  {
+    "$sort": {
+      "$created_at": -1
+    }
+  }
+]
