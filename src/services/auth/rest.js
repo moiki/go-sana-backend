@@ -158,6 +158,8 @@ export const useAuthorizedApi = ({
     useEffect(() => {
         if (automatic) {
             executeService()
+        } else {
+            setLoading(false)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -220,4 +222,107 @@ export const useFreeApi = (
     };
 
     return { data, loading, error, executeService };
+};
+
+// no Hook Axios Method
+/**
+ * <function description>
+ * @moisesRadix
+ * Normal axios endpoint fetch function (async)
+ * @param {string} url enpoint url for request
+ * @param {object} bodyData body object in case of a non-get method
+ * @param {string} method "GET"|POST"|"PUT"|"DELETE"
+ * @param {string} contentType [Optional] Content type
+ */
+export const CustomAxios = async (
+    url = '',
+    bodyData = {},
+    method = 'post',
+    contentType = 'application/json'
+) => {
+    try {
+        const isLogin = await verifyTokenLogin();
+        if (isLogin) {
+            const TOKEN = localStorage.getItem('token');
+            return await instanceAxios({
+                method: method,
+                url: url,
+                data: bodyData,
+                headers: {
+                    'Content-Type': contentType.toString(),
+                    ...importHeaders(),
+                    Authorization: 'Bearer ' + TOKEN,
+                },
+            });
+        } else {
+            return {
+                error: {
+                    message: 'Token Expired',
+                },
+            };
+        }
+    } catch (error) {
+        // console.log('CustomAxios Error:', error);
+        return {
+            error: {
+                message: error.message,
+                statusText: error.response ? error.response.statusText : null,
+                code: error.response ? error.response.status : 500,
+                payload: error.response
+                    ? error.response.data
+                        ? error.response.data.payload
+                            ? error.response.data.payload.message
+                            : error.response.data.message
+                        : `Temporarily out of service`
+                    : `Temporarily Out Of Service`,
+            },
+        };
+    }
+};
+
+/**
+ * <function description>
+ * @moisesRadix
+ * Alternative axios endpoint fetch function
+ * @param {string} url endpoint url for request
+ * @param {object} bodyData body object in case of a non-get method
+ * @param {string} method "GET"|POST"|"PUT"|"DELETE"
+ * @param {string} contentType [Optional] Content type
+ * @returns {Promise<void>} Promise
+ */
+export const CustomAxiosPromise = (
+    url = '',
+    bodyData = {},
+    method = 'post',
+    authToken = null
+) => {
+    return new Promise(async (res, rej) => {
+        try {
+            const isLogin = await verifyTokenLogin();
+
+            if (isLogin || authToken) {
+                const TOKEN = authToken ? authToken : localStorage.getItem('token');
+
+                const response = await instanceAxios({
+                    method: method,
+                    url: url,
+                    data: bodyData,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + TOKEN,
+                        ...importHeaders(),
+                    },
+                });
+                res(response);
+            } else {
+                rej({
+                    error: {
+                        message: 'Token Expired',
+                    },
+                });
+            }
+        } catch (error) {
+            rej({ message: error });
+        }
+    });
 };

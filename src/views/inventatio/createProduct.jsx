@@ -23,6 +23,7 @@ const validatePrimeNumber = (number) => {
 
 export default function CreateProduct() {
     const [form] = Form.useForm();
+    const [providersState, setProvidersState] = useState([]);
     const [openAddProvider, setOpenAddProvider] = useState(false);
     const [precio, setPrecio] = useState({
         value: 1,
@@ -38,6 +39,21 @@ export default function CreateProduct() {
         setCantidad({ ...validatePrimeNumber(value), value });
     };
 
+    // Get Providers
+    const {executeService: GetProviders} = useAuthorizedApi({
+        url: "/inventory/providers",
+        method: "GET",
+        automatic: true,
+        onSuccess: (response)=> {
+            // console.log(response.data)
+
+            setProvidersState(response.data.data)
+        },
+        onError: (err) => {
+            openNotificationWithIcon("error", "No se pudo cargar proveedores.", err.message)
+        }
+    })
+    // Post Create Product
     const {loading, error, executeService} = useAuthorizedApi({
         url: "/inventory/create",
         method: "POST",
@@ -54,9 +70,14 @@ export default function CreateProduct() {
       await executeService(values);
   };
 
-  return (
+    const closeProviderModal = () => {
+        setOpenAddProvider(false);
+        GetProviders()
+    }
+
+    return (
   <div className="layout-content">
-      <AddProvider open={openAddProvider} closeModal={()=> setOpenAddProvider(false)}/>
+      <AddProvider open={openAddProvider} closeModal={closeProviderModal}/>
       <div >
             <Col xs={"24"} xl={"24"}>
                 <Card bordered={false} >
@@ -136,18 +157,15 @@ export default function CreateProduct() {
                                    name={"presentation"}
                                    rules={[{ required: true, message: 'Defina una presentacion para el producto.' }]}
                                >
-                                   <Input.Group compact>
                                        <Select style={{ width: 200 }} placeholder="Seleccione una presentacion">
                                            <Select.Option value="Tableta">Tableta</Select.Option>
                                            <Select.Option value="Jarabe">Jarabe</Select.Option>
                                            <Select.Option value="Crema/Gel">Crema/Gel</Select.Option>
                                            <Select.Option value="Ampolla">Ampolla</Select.Option>
                                        </Select>
-                                       <Button type={"primary"}>Agregue una nueva</Button>
-                                   </Input.Group>
-
 
                                </Form.Item>
+                               <Button type={"primary"}>Agregue una nueva</Button>
                                <Form.Item
                                    label={"Laboratorio"}
                                    name={"laboratorio"}
@@ -169,8 +187,11 @@ export default function CreateProduct() {
                                >
                                    <Input.Group compact>
                                        <Select style={{ width: 200 }} placeholder="Seleccione una presentacion">
-                                           <Select.Option value="DisegSA">DisegSA</Select.Option>
-                                           <Select.Option value="Farmacia Auxiliadora">Farmacia Auxiliadora</Select.Option>
+                                           {
+                                               providersState.map((item, index) => {
+                                               return <Select.Option value={item?.provider_id} key={index}>{item.name}</Select.Option>
+                                           })
+                                           }
                                        </Select>
                                        <Button type={"primary"} onClick={(e)=> {
                                            e.preventDefault()

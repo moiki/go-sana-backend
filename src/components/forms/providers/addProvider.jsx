@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Radio } from 'antd';
+import {Button, Form, Input, Modal, Radio, Spin} from 'antd';
 import {useAuthorizedApi} from "../../../services/auth/rest.js";
 import openNotificationWithIcon from "../../alerts/notifications.jsx";
 
@@ -6,7 +6,7 @@ export default function AddProvider({ open, closeModal }) {
     const [form] = Form.useForm();
 
     const {loading, executeService} = useAuthorizedApi({
-        url: "",
+        url: "/inventory/provider",
         method: "POST",
         onSuccess:() => {
             form.resetFields()
@@ -42,51 +42,53 @@ export default function AddProvider({ open, closeModal }) {
                     });
             }}
         >
-            <Form
-                form={form}
-                layout="vertical"
-                name="form_in_modal"
-            >
-                <Form.Item
-                    name="name"
-                    label="Nombre de Proveedor"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Especifique el nombre del proveedor.',
-                        },
-                    ]}
+            <Spin spinning={loading} tip={"Guardando..."} delay={500}>
+                <Form
+                    form={form}
+                    layout="vertical"
+                    name="form_in_modal"
                 >
-                    <Input />
-                </Form.Item>
-                <Form.Item
-                    name="auth_code"
-                    label="Codigo de Proveedor"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Especifique el codigo del proveedor.',
-                        },
-                    ]}
-                >
-                    <Input />
-                </Form.Item>
-                <Form.Item
-                    name="telephone"
-                    label="Telefono"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Especifique el telefono del proveedor.',
-                        },
-                    ]}
-                >
-                    <Input />
-                </Form.Item>
-                <Form.Item name="direction" label="Direccion">
-                    <Input type="textarea" />
-                </Form.Item>
-            </Form>
+                    <Form.Item
+                        name="name"
+                        label="Nombre de Proveedor"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Especifique el nombre del proveedor.',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        name="auth_code"
+                        label="Codigo de Proveedor"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Especifique el codigo del proveedor.',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        name="telephone"
+                        label="Telefono"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Especifique el telefono del proveedor.',
+                            },
+                        ]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item name="direction" label="Direccion">
+                        <Input type="textarea" />
+                    </Form.Item>
+                </Form>
+            </Spin>
         </Modal>
     );
 };
