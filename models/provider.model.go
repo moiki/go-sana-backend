@@ -17,9 +17,6 @@ var ProviderIndex = []mongo.IndexModel{
 		Options: options.Index().SetUnique(true),
 	},
 	{
-		Keys: bson.D{{"auth_code", "text"}},
-	},
-	{
 		Keys: bson.D{{"created_at", -1}},
 	},
 }

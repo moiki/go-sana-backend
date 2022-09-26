@@ -1,21 +1,36 @@
 package services
 
 import (
-	"context"
 	"fmt"
 	"go-sana-blackend/connections"
 	"go-sana-blackend/models"
+	"go-sana-blackend/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	//"go-sana-blackend/models"
 )
 
-var ProductCollection = connections.GetCollection("products", connections.IndexOptions{HasIndex: false})
+var ProductCollection = connections.GetCollection("snProducts", connections.IndexOptions{HasIndex: true, Indexes: models.ProductIndex})
 
-func ListProductPipeline(perPage int16, page int16) []bson.D {
-	var result []bson.D
-
+func ListProductPipeline(perPage int16, page int16, filter string) []bson.D {
+	var matchOrCreate bson.M
+	if filter != "" {
+		matchOrCreate = bson.M{
+			"$match": bson.M{
+				"$text": bson.M{
+					"$search": filter,
+				},
+			},
+		}
+	} else {
+		matchOrCreate = bson.M{
+			"$sort": bson.M{
+				"created_at": -1,
+			},
+		}
+	}
 	pipe := []bson.M{
+		matchOrCreate,
 		{
 			"$match": bson.M{
 				"is_active": true,
@@ -64,34 +79,25 @@ func ListProductPipeline(perPage int16, page int16) []bson.D {
 			},
 		},
 	}
-	for _, stage := range pipe {
-		var convertedStage bson.D
-		newStage, err := bson.Marshal(stage)
-		if err != nil {
-			println("IN MARSHAL")
-			panic(err.Error())
-		}
-		if bsonErr := bson.Unmarshal(newStage, &convertedStage); bsonErr != nil {
-			println("IN UN-MARSHAL")
-			panic(bsonErr.Error())
-		}
-		result = append(result, convertedStage)
+	if filter != "" {
+		pipe = append(pipe)
 	}
+	result := utils.ParsePipeline(pipe)
 
 	return result
 }
 
-func ListProducts(perPage int16, page int16) ([]bson.M, error) {
+func ListProducts(perPage int16, page int16, filter string) ([]bson.M, error) {
 	var productsTable []bson.M
 
-	ListPipeline := ListProductPipeline(perPage, page)
-	fmt.Println(ListPipeline)
+	ListPipeline := ListProductPipeline(perPage, page, filter)
+	//fmt.Println(ListPipeline)
 	data, err := ProductCollection.Aggregate(connections.DbCtx, mongo.Pipeline(ListPipeline))
 	if err != nil {
 		fmt.Println("aggregate error: ", err)
 		return productsTable, err
 	}
-	if decodeError := data.All(context.TODO(), &productsTable); decodeError != nil {
+	if decodeError := data.All(connections.DbCtx, &productsTable); decodeError != nil {
 		fmt.Println("decodeError error: ", decodeError.Error())
 		return productsTable, decodeError
 	}

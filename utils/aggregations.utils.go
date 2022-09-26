@@ -6,6 +6,28 @@ import (
 	"log"
 )
 
+/*
+type STAGES string
+
+const (
+	MATCH      STAGES = "$match"
+	PROJECT    STAGES = "$project"
+	FACET      STAGES = "$facet"
+	GROUP      STAGES = "$group"
+	UNWIND     STAGES = "$unwind"
+	ADD_FIELDS STAGES = "$addFields"
+	UNION_WITH STAGES = "$unionWith"
+	LIMIT      STAGES = "$limit"
+	SORT       STAGES = "$sort"
+	LOOKUP     STAGES = "$lookup"
+)
+
+type ElementDoc struct {
+	Element string
+	SubDoc  *ElementDoc
+}
+*/
+
 func GeneratePipelineFromJSON(path string) []bson.D {
 	var pipeline []bson.D
 	content, err := ioutil.ReadFile(path)
@@ -17,6 +39,25 @@ func GeneratePipelineFromJSON(path string) []bson.D {
 		panic(errMarshalling)
 	}
 	return pipeline
+}
+
+func ParsePipeline(pipe []bson.M) []bson.D {
+	var result []bson.D
+	for _, stage := range pipe {
+		var convertedStage bson.D
+		newStage, err := bson.Marshal(stage)
+		if err != nil {
+			println("IN MARSHAL")
+			panic(err.Error())
+		}
+		if bsonErr := bson.Unmarshal(newStage, &convertedStage); bsonErr != nil {
+			println("IN UN-MARSHAL")
+			panic(bsonErr.Error())
+		}
+		result = append(result, convertedStage)
+	}
+
+	return result
 }
 
 //

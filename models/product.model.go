@@ -10,7 +10,7 @@ import (
 
 var ProductIndex = []mongo.IndexModel{
 	{
-		Keys:    bson.D{{"nombre", "text"}},
+		Keys:    bson.D{{"name", "text"}},
 		Options: options.Index().SetUnique(true),
 	},
 	{
@@ -28,6 +28,7 @@ var ProductIndex = []mongo.IndexModel{
 type Product struct {
 	ProductId             string    `json:"product_id,omitempty" bson:"product_id"`
 	LaboratoryId          string    `json:"laboratory_id,omitempty" bson:"laboratory_id"`
+	ProviderId            string    `json:"provider_id,omitempty" bson:"provider_id"`
 	ProductPresentationId string    `bson:"product_presentation_id,omitempty" bson:"product_presentation_id"`
 	Name                  string    `json:"name,omitempty" bson:"name"`
 	ProductCode           string    `json:"product_code,omitempty" bson:"product_code"`

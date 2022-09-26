@@ -31,7 +31,7 @@ func GenerateJWT(
 	claims["email"] = email
 	claims["name"] = fmt.Sprintf("%s %s", fn, ln)
 	claims["user_id"] = id
-	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 	newToken, err := token.SignedString([]byte(EnvData.SkKey))
 	if err != nil {
 		return "", err
