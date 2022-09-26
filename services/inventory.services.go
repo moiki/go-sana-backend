@@ -112,3 +112,11 @@ func CreateProduct(product models.Product) error {
 	}
 	return nil
 }
+
+func CreateProductPresentation(product models.ProductPresentation) error {
+	_, err := ProductCollection.InsertOne(connections.DbCtx, product)
+	if err != nil {
+		return err
+	}
+	return nil
+}

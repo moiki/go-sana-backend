@@ -22,14 +22,15 @@ func GetProvidersForSelect(ctx *fiber.Ctx) error {
 		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
 		return nil
 	}
-	var providerResult []map[string]interface{}
+	fmt.Println(providers)
+	var providerResult = []map[string]interface{}{}
 	for _, provider := range providers {
 		providerResult = append(providerResult, map[string]interface{}{
 			"provider_id": provider.ProviderId,
 			"name":        provider.Name,
 		})
 	}
-	ctx.JSON(fiber.Map{"data": providerResult})
+	ctx.JSON(fiber.Map{"data": providerResult, "size": len(providerResult)})
 	return nil
 }
 

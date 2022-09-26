@@ -2,8 +2,22 @@ package models
 
 import (
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 	"time"
 )
+
+var ProductPresentationIndex = []mongo.IndexModel{
+	{
+		Keys:    bsonx.Doc{{Key: "name", Value: bsonx.String("text")}},
+		Options: options.Index().SetUnique(true),
+	},
+	{
+		Keys: bson.D{{"created_at", -1}},
+	},
+}
 
 type ProductPresentation struct {
 	ProductPresentationId string    `json:"product_presentation_id,omitempty" bson:"product_presentation_id"`
