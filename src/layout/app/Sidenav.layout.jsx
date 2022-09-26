@@ -92,8 +92,6 @@ function Sidenav({ color }) {
 
   const loadLinks = () =>
     adminLinks.map((item, index) => {
-      if (pathname === `/${item.layout}${item.path}`) {
-      }
       return (
         <Menu.Item key={index}>
           {pathname === `/${item.layout}${item.path}` ? (

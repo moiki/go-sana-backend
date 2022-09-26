@@ -1,17 +1,10 @@
-import {Button, Card, Col, Form, Input, InputNumber, Row} from "antd";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
+import {Button, Card, Col, Form, Input, InputNumber, Row, Select} from "antd";
 import {useAuthorizedApi} from "../../services/auth/rest.js";
 import openNotificationWithIcon from "../../components/alerts/notifications.jsx";
 import {Link} from "react-router-dom";
+import AddProvider from "../../components/forms/providers/addProvider.jsx";
 
-const layout = {
-  labelCol: {
-    span: 2,
-  },
-  wrapperCol: {
-    span: 8,
-  },
-}
 
 const validatePrimeNumber = (number) => {
     // const data = Number(number.replace(/C\$\s?|(,*)/g, ''))
@@ -30,6 +23,7 @@ const validatePrimeNumber = (number) => {
 
 export default function CreateProduct() {
     const [form] = Form.useForm();
+    const [openAddProvider, setOpenAddProvider] = useState(false);
     const [precio, setPrecio] = useState({
         value: 1,
     });
@@ -60,85 +54,135 @@ export default function CreateProduct() {
       await executeService(values);
   };
 
-  const onFinishFailed = (data) => console.log(data)
-
   return (
   <div className="layout-content">
+      <AddProvider open={openAddProvider} closeModal={()=> setOpenAddProvider(false)}/>
       <div >
-          <Col xs={"24"} xl={"24"}>
-              <Card bordered={false} >
-                  <h3>Agrega un nuevo producto</h3>
-                  <hr/>
-                  <div style={{marginBottom: "3rem"}}></div>
-                  <Form
-                      title={"Agrega un nuevo producto"}
-                      name="basic"
-                      labelCol={{ span: 2 }}
-                      wrapperCol={{ span: 10 }}
-                      form={form}
-                      onFinish={onFinish}
-                      onFinishFailed={onFinishFailed}
-                      autoComplete="off"
-                  >
-                      <Form.Item
-                          label="Producto"
-                          name="name"
-                          rules={[{ required: true, message: 'El nombre del producto es requerido.' }]}
-                      >
-                          <Input />
-                      </Form.Item>
+            <Col xs={"24"} xl={"24"}>
+                <Card bordered={false} >
+                    <h3>Agrega un nuevo producto</h3>
+                    <hr/>
+                    <div style={{marginBottom: "3rem"}}></div>
+                    <Form
+                        title={"Agrega un nuevo producto"}
+                        name="basic"
+                        labelCol={{ span: 5 }}
+                        wrapperCol={{ span: 16 }}
+                        form={form}
+                        onFinish={onFinish}
+                        autoComplete="off"
+                    >
+                       <Row gutter={[8,8]}>
+                           <Col md={{span: 8}} xl={{span: 8}} lg={{span: 8}} xs={{span: 24}}>
+                               <Form.Item
+                                   label="Producto"
+                                   name="name"
+                                   rules={[{ required: true, message: 'El nombre del producto es requerido.' }]}
+                               >
+                                   <Input />
+                               </Form.Item>
 
-                      <Form.Item
-                          label="Código"
-                          name="product_code"
-                          rules={[{ required: true, message: 'Código es requerido.' }]}
-                      >
-                          <Input />
-                      </Form.Item>
-                      <Form.Item
-                          label="Cantidad"
-                          name="quantity"
-                      >
-                          <InputNumber
-                              defaultValue={1}
-                              min={1}
-                              value={cantidad.value}
-                              onChange={onCantidadChange}
-                              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                              parser={value => value.replace(/(,*)/g, '')}
-                          />
-                      </Form.Item>
-                      <Form.Item
-                          label="Precio Unitario"
-                          name="price"
-                      >
-                          <InputNumber
-                              defaultValue={1}
-                              min={1}
-                              value={precio.value}
-                              onChange={onPriceChange}
-                              formatter={value => `C$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                              parser={value => value.replace(/C\$\s?|(,*)/g, '')}
+                               <Form.Item
+                                   label="Código"
+                                   name="product_code"
+                                   rules={[{ required: true, message: 'Código es requerido.' }]}
+                               >
+                                   <Input />
+                               </Form.Item>
+                               <Form.Item
+                                   label="Cantidad"
+                                   name="quantity"
+                               >
+                                   <InputNumber
+                                       defaultValue={1}
+                                       min={1}
+                                       value={cantidad.value}
+                                       onChange={onCantidadChange}
+                                       formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                       parser={value => value.replace(/(,*)/g, '')}
+                                   />
+                               </Form.Item>
+                               <Form.Item
+                                   label="Precio Unitario"
+                                   name="price"
+                               >
+                                   <InputNumber
+                                       defaultValue={1}
+                                       min={1}
+                                       value={precio.value}
+                                       onChange={onPriceChange}
+                                       formatter={value => `C$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                       parser={value => value.replace(/C\$\s?|(,*)/g, '')}
 
-                          />
-                      </Form.Item>
+                                   />
+                               </Form.Item>
 
-                      <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
-                         <div >
-                             <Button style={{marginRight: 12}} type="primary" htmlType="submit">
-                                 GUARDAR
-                             </Button>
-                             <Link to={"/admin/inventario"}>
-                                 <Button type="primary" danger>
-                                     REGRESAR
-                                 </Button>
-                             </Link>
-                         </div>
-                      </Form.Item>
-                  </Form>
-              </Card>
-          </Col>
+                               <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
+                                   <div >
+                                       <Button style={{marginRight: 12}} type="primary" htmlType="submit">
+                                           GUARDAR Y CONTINUAR
+                                       </Button>
+                                       <Link to={"/admin/inventario"}>
+                                           <Button type="primary" danger>
+                                               REGRESAR
+                                           </Button>
+                                       </Link>
+                                   </div>
+                               </Form.Item>
+                           </Col>
+                           <Col md={{span: 10}} xl={{span: 12}} lg={{span: 10}} xs={{span: 24}}>
+                               <Form.Item
+                                   label={"Presentacion"}
+                                   name={"presentation"}
+                                   rules={[{ required: true, message: 'Defina una presentacion para el producto.' }]}
+                               >
+                                   <Input.Group compact>
+                                       <Select style={{ width: 200 }} placeholder="Seleccione una presentacion">
+                                           <Select.Option value="Tableta">Tableta</Select.Option>
+                                           <Select.Option value="Jarabe">Jarabe</Select.Option>
+                                           <Select.Option value="Crema/Gel">Crema/Gel</Select.Option>
+                                           <Select.Option value="Ampolla">Ampolla</Select.Option>
+                                       </Select>
+                                       <Button type={"primary"}>Agregue una nueva</Button>
+                                   </Input.Group>
 
+
+                               </Form.Item>
+                               <Form.Item
+                                   label={"Laboratorio"}
+                                   name={"laboratorio"}
+                                   rules={[{ required: true, message: 'Defina una presentacion para el producto.' }]}
+                               >
+                                   <Input.Group compact>
+                                       <Select style={{ width: 200 }} placeholder="Seleccione una presentacion">
+                                           <Select.Option value="Ramos">Ramos</Select.Option>
+                                           <Select.Option value="Lasantee">Lasantee</Select.Option>
+                                           <Select.Option value="Bayern">Bayern</Select.Option>
+                                       </Select>
+                                       <Button type={"primary"}>Agregue una nueva</Button>
+                                   </Input.Group>
+                               </Form.Item>
+                               <Form.Item
+                                   label={"Proveedor"}
+                                   name={"proveedor"}
+                                   rules={[{ required: true, message: 'Defina una presentacion para el producto.' }]}
+                               >
+                                   <Input.Group compact>
+                                       <Select style={{ width: 200 }} placeholder="Seleccione una presentacion">
+                                           <Select.Option value="DisegSA">DisegSA</Select.Option>
+                                           <Select.Option value="Farmacia Auxiliadora">Farmacia Auxiliadora</Select.Option>
+                                       </Select>
+                                       <Button type={"primary"} onClick={(e)=> {
+                                           e.preventDefault()
+                                           setOpenAddProvider(true)
+                                       }}>Agregue una nueva</Button>
+                                   </Input.Group>
+                               </Form.Item>
+                           </Col>
+                       </Row>
+                    </Form>
+                </Card>
+            </Col>
       </div>
   </div>
   );

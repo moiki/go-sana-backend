@@ -11,6 +11,7 @@ import AppLayout, {LoadContent} from "./layout/app/app.layout";
 import "antd/dist/antd.css";
 import "./assets/styles/main.styles.css";
 import "./assets/styles/responsive.styles.css";
+
 // export const hist = createBrowserHistory();
 
 function init(state) {

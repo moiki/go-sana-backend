@@ -271,9 +271,9 @@ function Header({
 
     return (
         <>
-            <div className="setting-drwer" onClick={showDrawer}>
-                {setting}
-            </div>
+            {/*<div className="setting-drwer" onClick={showDrawer}>*/}
+            {/*    {setting}*/}
+            {/*</div>*/}
             <Row gutter={[24, 0]}>
                 <Col span={24} md={6}>
                     <Breadcrumb>
@@ -294,19 +294,10 @@ function Header({
                     </div>
                 </Col>
                 <Col span={24} md={18} className="header-control">
-                    <Badge size="small" count={4}>
-                        <Dropdown overlay={menu} trigger={["click"]}>
-                            <a
-                                href="#pablo"
-                                className="ant-dropdown-link"
-                                onClick={(e) => e.preventDefault()}
-                            >
-                                {bell}
-                            </a>
-                        </Dropdown>
-                    </Badge>
+
                     <Button type="link" onClick={showDrawer}>
-                        {logsetting}
+                        {profile}
+                        <b>Opciones</b>
                     </Button>
                     <Button
                         type="link"
@@ -335,15 +326,6 @@ function Header({
                             </Row>
                         </div>
                     </Drawer>
-                    <Link to="/sign-in" className="btn-sign-in">
-                        {profile}
-                        <span>Sign in</span>
-                    </Link>
-                    <Input
-                        className="header-search"
-                        placeholder="Type here..."
-                        prefix={<SearchOutlined/>}
-                    />
                 </Col>
             </Row>
         </>
