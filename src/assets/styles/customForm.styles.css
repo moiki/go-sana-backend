@@ -1,0 +1,7 @@
+.select-item-group-btn {
+    display: flex;
+    align-items: start;
+}
+.select-item-group-btn button {
+    border-radius: 0;
+}
