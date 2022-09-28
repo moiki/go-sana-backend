@@ -10,7 +10,6 @@ import {PlusCircleOutlined, SearchOutlined, ToTopOutlined} from "@ant-design/ico
 import { useAuthorizedApi } from "../../services/auth/rest.js";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import debounce from "lodash.debounce"
 import moment from "moment";
 import 'moment/locale/es';
 import 'moment/min/moment-with-locales'
@@ -21,7 +20,11 @@ const columns = [
     title: "Nombre de Producto",
     dataIndex: "name",
     key: "name",
-    width: "32%",
+  },
+  {
+    title: "Presentacion",
+    dataIndex: "presentation",
+    key: "presentation",
   },
   {
     title: "Fecha Ingreso",
@@ -109,7 +112,7 @@ export default function InventarioView() {
                   <Link
                     to={"/admin/inventario/crear"}
                   >
-                   <Button type={"primary"}>
+                   <Button type={"primary"} style={{borderRadius: 0}}>
                      <PlusCircleOutlined />
                      Add Product
                    </Button>

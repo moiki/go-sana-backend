@@ -22,7 +22,7 @@ export  default function LoadingScreen (props) {
        }
     }, [state.user]);
 
-    return <div className={"d-flex justify-content-center align-items-center"} style={{height:"100vh"}}>
+    return <div className={"d-flex justify-content-center align-items-center"} style={{height:"100vh", background: "white"}}>
         <div className={""}>
             <Lottie options={defaultOptions} height={300} width={300} />
         </div>
