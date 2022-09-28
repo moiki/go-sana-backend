@@ -10,7 +10,8 @@ import (
 
 var ProviderIndex = []mongo.IndexModel{
 	{
-		Keys: bson.D{{"name", "text"}},
+		Keys:    bson.D{{"name", "text"}},
+		Options: options.Index().SetUnique(true),
 	},
 	{
 		Keys:    bson.D{{"provider_id", -1}},
@@ -22,16 +23,15 @@ var ProviderIndex = []mongo.IndexModel{
 }
 
 type Provider struct {
-	ProviderId   string    `json:"provider_id,omitempty" bson:"provider_id"`
-	Name         string    `json:"name,omitempty" bson:"name"`
-	Direction    string    `json:"direction,omitempty" bson:"direction"`
-	Telephone    string    `json:"telephone,omitempty" bson:"telephone"`
-	AuthCode     string    `json:"auth_code,omitempty" bson:"auth_code"`
-	BrandImage   string    `json:"brand_image,omitempty" bson:"brand_image"`
-	ProviderType string    `json:"provider_type,omitempty" bson:"provider_type"`
-	IsActive     bool      `json:"is_active,omitempty" bson:"is_active"`
-	CreatedAt    time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at" bson:"updated_at"`
+	ProviderId string    `json:"provider_id,omitempty" validate:"required" bson:"provider_id"`
+	Name       string    `json:"name,omitempty" validate:"required" bson:"name"`
+	Direction  string    `json:"direction,omitempty" validate:"required" bson:"direction"`
+	Telephone  string    `json:"telephone,omitempty" validate:"required" bson:"telephone"`
+	AuthCode   string    `json:"auth_code,omitempty" validate:"required" bson:"auth_code"`
+	BrandImage string    `json:"brand_image,omitempty" bson:"brand_image"`
+	IsActive   bool      `json:"is_active,omitempty" validate:"required" bson:"is_active"`
+	CreatedAt  time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at" bson:"updated_at"`
 }
 
 func (l Provider) NewProvider() Provider {

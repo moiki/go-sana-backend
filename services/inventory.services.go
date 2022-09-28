@@ -11,6 +11,7 @@ import (
 )
 
 var ProductCollection = connections.GetCollection("snProducts", connections.IndexOptions{HasIndex: true, Indexes: models.ProductIndex})
+var ProductPresentationCollection = connections.GetCollection("snProductPresentations", connections.IndexOptions{HasIndex: true, Indexes: models.ProductPresentationIndex})
 
 func ListProductPipeline(perPage int16, page int16, filter string) []bson.D {
 	var matchOrCreate bson.M
@@ -62,6 +63,54 @@ func ListProductPipeline(perPage int16, page int16, filter string) []bson.D {
 						"$limit": perPage,
 					},
 					bson.M{
+						"$lookup": bson.M{
+							"from": "snProductPresentations",
+							"as":   "presentation",
+							"let": bson.M{
+								"presentation_id": "$product_presentation_id",
+							},
+							"pipeline": bson.A{
+								bson.M{
+									"$match": bson.M{
+										"$expr": bson.M{
+											"$and": bson.A{
+												bson.M{
+													"$eq": bson.A{
+														"$product_presentation_id",
+														"$$presentation_id",
+													},
+												},
+												bson.M{
+													"$eq": bson.A{
+														"$is_active",
+														true,
+													},
+												},
+											},
+										},
+									},
+								},
+								bson.M{
+									"$project": bson.M{
+										"_id":  0,
+										"name": 1,
+									},
+								},
+							},
+						},
+					},
+					bson.M{
+						"$unwind": bson.M{
+							"path":                       "$presentation",
+							"preserveNullAndEmptyArrays": true,
+						},
+					},
+					bson.M{
+						"$addFields": bson.M{
+							"presentation": "$presentation.name",
+						},
+					},
+					bson.M{
 						"$project": bson.M{
 							"_id": 0,
 						},
@@ -106,6 +155,10 @@ func ListProducts(perPage int16, page int16, filter string) ([]bson.M, error) {
 }
 
 func CreateProduct(product models.Product) error {
+	validationError := utils.ModelValidation.Struct(product)
+	if validationError != nil {
+		return validationError
+	}
 	_, err := ProductCollection.InsertOne(connections.DbCtx, product)
 	if err != nil {
 		return err
@@ -113,8 +166,26 @@ func CreateProduct(product models.Product) error {
 	return nil
 }
 
-func CreateProductPresentation(product models.ProductPresentation) error {
-	_, err := ProductCollection.InsertOne(connections.DbCtx, product)
+func ListProductPresentationForSelect() ([]models.ProductPresentation, error) {
+	var result []models.ProductPresentation
+
+	data, err := ProductPresentationCollection.Find(connections.DbCtx, bson.M{"is_active": true})
+	if err != nil {
+		return result, err
+	}
+	if decodeError := data.All(connections.DbCtx, &result); decodeError != nil {
+		fmt.Println("Provider decodeError error: ", decodeError.Error())
+		return result, decodeError
+	}
+	return result, nil
+}
+
+func CreateProductPresentation(presentation models.ProductPresentation) error {
+	validationError := utils.ModelValidation.Struct(presentation)
+	if validationError != nil {
+		return validationError
+	}
+	_, err := ProductPresentationCollection.InsertOne(connections.DbCtx, presentation)
 	if err != nil {
 		return err
 	}

@@ -20,10 +20,10 @@ var ProductPresentationIndex = []mongo.IndexModel{
 }
 
 type ProductPresentation struct {
-	ProductPresentationId string    `json:"product_presentation_id,omitempty" bson:"product_presentation_id"`
-	Name                  string    `json:"name,omitempty" bson:"name"`
+	ProductPresentationId string    `json:"product_presentation_id,omitempty" validate:"required" bson:"product_presentation_id"`
+	Name                  string    `json:"name,omitempty" validate:"required" bson:"name"`
 	Description           string    `json:"description,omitempty" bson:"description"`
-	IsActive              bool      `json:"is_active,omitempty" bson:"is_active"`
+	IsActive              bool      `json:"is_active,omitempty" validate:"required" bson:"is_active"`
 	CreatedAt             time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt             time.Time `json:"updated_at" bson:"updated_at"`
 }

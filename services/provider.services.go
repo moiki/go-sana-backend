@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-sana-blackend/connections"
 	"go-sana-blackend/models"
+	"go-sana-blackend/utils"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -24,6 +25,10 @@ func ListProviders() ([]models.Provider, error) {
 }
 
 func CreateProvider(provider models.Provider) error {
+	validationError := utils.ModelValidation.Struct(provider)
+	if validationError != nil {
+		return validationError
+	}
 	_, err := ProviderCollection.InsertOne(connections.DbCtx, provider)
 	if err != nil {
 		return err

@@ -10,12 +10,16 @@ require (
 	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.10.1
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+	gopkg.in/go-playground/validator.v9 v9.31.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
+	github.com/go-playground/locales v0.14.0 // indirect
+	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -28,4 +32,5 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/text v0.3.7 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

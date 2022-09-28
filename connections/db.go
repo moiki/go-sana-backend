@@ -11,10 +11,6 @@ import (
 	"log"
 )
 
-var (
-	host = "localhost"
-	port = 27017
-)
 var collection *mongo.Collection
 var DbCtx = context.TODO()
 var MongoCtx = context.Background()
@@ -31,7 +27,8 @@ func EnsureIndex(cd *mongo.Collection, indexes []mongo.IndexModel) error {
 
 	_indexes, err := cd.Indexes().CreateMany(DbCtx, indexes, opts)
 	if err != nil {
-		fmt.Printf("error while executing index Query %s\n", err.Error())
+
+		fmt.Printf("error while executing index Query %s  %s\n", cd.Name(), err.Error())
 		return err
 	}
 	fmt.Println(_indexes)

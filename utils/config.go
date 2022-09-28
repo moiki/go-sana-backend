@@ -2,10 +2,11 @@ package utils
 
 import (
 	_ "github.com/joho/godotenv/autoload"
+	"gopkg.in/go-playground/validator.v9"
 	"os"
 )
 
-//var Port = os.Getenv("PORT")
+var ModelValidation = validator.New()
 
 var EnvData = struct {
 	Port            string
