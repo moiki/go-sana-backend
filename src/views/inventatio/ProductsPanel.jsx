@@ -59,7 +59,7 @@ export default function ProductsPanel() {
         docs: [],
     });
     const { loading, data, executeService } = useAuthorizedApi({
-        url: `/inventory/list?per_page=${tableParams.perPage}&page=${tableParams.page}&filter=${tableParams.filter}`,
+        url: `/inventory/products-table?per_page=${tableParams.perPage}&page=${tableParams.page}&filter=${tableParams.filter}`,
         onError: (err) => {
             console.log(err);
         },

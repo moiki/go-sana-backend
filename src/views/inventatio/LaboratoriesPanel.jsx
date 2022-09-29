@@ -7,9 +7,9 @@ const columns = [
         key: "name",
     },
     {
-        title: "Presentacion",
-        dataIndex: "presentation",
-        key: "presentation",
+        title: "Codigo",
+        dataIndex: "auth_code",
+        key: "auth_code",
     },
     {
         title: "Fecha Ingreso",
@@ -22,24 +22,5 @@ const columns = [
         dataIndex: "product_code",
         key: "product_code",
     },
-    {
-        title: "Precio",
-        key: "price",
-        dataIndex: "price",
-        render: (text) => (
-            <b style={{ color: "green" }}>
-                {`C$ ${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            </b>
-        ),
-    },
-    {
-        title: "Stock",
-        key: "quantity",
-        dataIndex: "quantity",
-        render: (text) => (
-            <b className={"success"}>
-                {`${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            </b>
-        ),
-    },
+
 ];
