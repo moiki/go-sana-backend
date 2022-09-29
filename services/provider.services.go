@@ -5,6 +5,7 @@ import (
 	"go-sana-blackend/connections"
 	"go-sana-blackend/models"
 	"go-sana-blackend/utils"
+	"go-sana-blackend/utils/snippets"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -34,4 +35,8 @@ func CreateProvider(provider models.Provider) error {
 		return err
 	}
 	return nil
+}
+
+func ListProvidersForTable(perPage int16, page int16, filter string) ([]bson.M, error) {
+	return snippets.GetSimpleTableFromCollection(perPage, page, filter, ProviderCollection)
 }

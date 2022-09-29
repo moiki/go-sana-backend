@@ -126,11 +126,41 @@ func AddLabFromInventory(ctx *fiber.Ctx) error {
 	})
 }
 
-func GetProductList(ctx *fiber.Ctx) error {
+func GetProductTable(ctx *fiber.Ctx) error {
 	var params TableParams
 	ctx.QueryParser(&params)
 	fmt.Println(params, ctx.Query("filter"))
 	products, err := services.ListProducts(params.PerPage, params.Page, params.Filter)
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+		return nil
+	}
+	//fmt.Println(products)
+	ctx.JSON(fiber.Map{"data": products})
+	return nil
+}
+
+func GetLabsTable(ctx *fiber.Ctx) error {
+	var params TableParams
+	ctx.QueryParser(&params)
+	fmt.Println(params, ctx.Query("filter"))
+	products, err := services.ListLabsForTable(params.PerPage, params.Page, params.Filter)
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+		return nil
+	}
+	//fmt.Println(products)
+	ctx.JSON(fiber.Map{"data": products})
+	return nil
+}
+
+func GetProvidersTable(ctx *fiber.Ctx) error {
+	var params TableParams
+	ctx.QueryParser(&params)
+	fmt.Println(params, ctx.Query("filter"))
+	products, err := services.ListProvidersForTable(params.PerPage, params.Page, params.Filter)
 	if err != nil {
 		fmt.Println(err.Error())
 		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
@@ -162,7 +192,9 @@ func CreateProduct(ctx *fiber.Ctx) error {
 }
 
 func InventoryRoutes(app fiber.Router) {
-	app.Get("/inventory/list", middlewares.JWTProtected(), GetProductList)
+	app.Get("/inventory/products-table", middlewares.JWTProtected(), GetProductTable)
+	app.Get("/inventory/labs-table", middlewares.JWTProtected(), GetLabsTable)
+	app.Get("/inventory/providers-table", middlewares.JWTProtected(), GetProvidersTable)
 	app.Post("/inventory/create", middlewares.JWTProtected(), CreateProduct)
 	// Getting the select lists
 	app.Get("/inventory/providers", middlewares.JWTProtected(), GetProvidersForSelect)

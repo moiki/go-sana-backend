@@ -20,7 +20,7 @@ func Login(data Credentials) (string, error) {
 	var user models.User
 	m := models.Session{}
 	session := m.NewSession()
-	errFind := collection.FindOne(connections.MongoCtx, bson.M{"email": data.Email}).Decode(&user)
+	errFind := collection.FindOne(connections.DbCtx, bson.M{"email": data.Email}).Decode(&user)
 	if errFind != nil {
 		return "", errFind
 	}

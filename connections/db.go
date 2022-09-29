@@ -13,7 +13,6 @@ import (
 
 var collection *mongo.Collection
 var DbCtx = context.TODO()
-var MongoCtx = context.Background()
 
 type IndexOptions struct {
 	HasIndex bool

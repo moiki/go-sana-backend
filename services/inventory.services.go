@@ -140,7 +140,7 @@ func ListProducts(perPage int16, page int16, filter string) ([]bson.M, error) {
 	var productsTable []bson.M
 
 	ListPipeline := ListProductPipeline(perPage, page, filter)
-	//fmt.Println(ListPipeline)
+
 	data, err := ProductCollection.Aggregate(connections.DbCtx, mongo.Pipeline(ListPipeline))
 	if err != nil {
 		fmt.Println("aggregate error: ", err)

@@ -6,27 +6,25 @@ import (
 	"log"
 )
 
-/*
-type STAGES string
-
-const (
-	MATCH      STAGES = "$match"
-	PROJECT    STAGES = "$project"
-	FACET      STAGES = "$facet"
-	GROUP      STAGES = "$group"
-	UNWIND     STAGES = "$unwind"
-	ADD_FIELDS STAGES = "$addFields"
-	UNION_WITH STAGES = "$unionWith"
-	LIMIT      STAGES = "$limit"
-	SORT       STAGES = "$sort"
-	LOOKUP     STAGES = "$lookup"
-)
+//type STAGES string
+//
+//const (
+//	MATCH      STAGES = "$match"
+//	PROJECT    STAGES = "$project"
+//	FACET      STAGES = "$facet"
+//	GROUP      STAGES = "$group"
+//	UNWIND     STAGES = "$unwind"
+//	ADD_FIELDS STAGES = "$addFields"
+//	UNION_WITH STAGES = "$unionWith"
+//	LIMIT      STAGES = "$limit"
+//	SORT       STAGES = "$sort"
+//	LOOKUP     STAGES = "$lookup"
+//)
 
 type ElementDoc struct {
 	Element string
-	SubDoc  *ElementDoc
+	SubDoc  interface{}
 }
-*/
 
 func GeneratePipelineFromJSON(path string) []bson.D {
 	var pipeline []bson.D
@@ -60,13 +58,13 @@ func ParsePipeline(pipe []bson.M) []bson.D {
 	return result
 }
 
-//
-//func CreateStage(stage STAGES, elements []ElementDoc) []interface{} {
-//
+//func CreateStage(stage STAGES, elements []ElementDoc) interface{} {
+//	var stageBlock map[string]interface{}
 //	switch stage {
 //	case PROJECT:
-//		for i := range elements {
-//			ele := elements[i]
+//		for _, element := range elements {
+//			stageBlock[element.Element] = element.SubDoc
 //		}
 //	}
+//	return stageBlock
 //}
