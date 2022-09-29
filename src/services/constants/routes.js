@@ -2,6 +2,7 @@ import Login from "../../components/forms/login/login.jsx";
 import HomeView from "../../views/homeView/index.jsx";
 import InventarioView from "../../views/inventatio/index.jsx";
 import CreateProduct from "../../views/inventatio/createProduct.jsx";
+import MainInventory from "../../views/inventatio/index.jsx";
 
 export const authRoutes = [
     {
@@ -34,7 +35,7 @@ export const appRoutes = [
         name: 'Inventario',
         isIndex: false,
         mini: 'H',
-        component: InventarioView,
+        component: MainInventory,
         layout: 'admin',
     },
     {

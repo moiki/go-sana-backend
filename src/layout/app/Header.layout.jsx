@@ -31,7 +31,7 @@ import {
     SearchOutlined,
     StarOutlined,
     TwitterOutlined,
-    FacebookFilled,
+    FacebookFilled, AntDesignOutlined,
 } from "@ant-design/icons";
 
 import {NavLink, Link, useNavigate} from "react-router-dom";
@@ -316,6 +316,17 @@ function Header({
                     >
                         <div layout="vertical">
                             <div className="header-top">
+                                <Avatar
+                                    size={{
+                                        xs: 24,
+                                        sm: 32,
+                                        md: 40,
+                                        lg: 64,
+                                        xl: 80,
+                                        xxl: 100,
+                                    }}
+                                    src={""}
+                                />
                                 <Title level={4}>
                                     {user.first_name}
                                     <Text className="subtitle">See our dashboard options.</Text>

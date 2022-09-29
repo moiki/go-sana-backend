@@ -147,17 +147,16 @@ export default function CreateProduct() {
             <Form
               title={"Agrega un nuevo producto"}
               name="basic"
-              labelCol={12}
-              wrapperCol={{ span: 24 }}
+              wrapperCol={{ span: 16 }}
               form={form}
               onFinish={onFinish}
               autoComplete="off"
             >
               <Row gutter={[8, 8]}>
                 <Col
-                  md={{ span: 8 }}
-                  xl={{ span: 8 }}
-                  lg={{ span: 8 }}
+                  md={{ span: 10 }}
+                  xl={{ span: 10 }}
+                  lg={{ span: 10 }}
                   xs={{ span: 24 }}
                 >
                 <Input.Group>
@@ -237,28 +236,11 @@ export default function CreateProduct() {
                     />
                   </Form.Item>
                 </Input.Group>
-
-                  <Form.Item wrapperCol={{ offset: 2, span: 16 }}>
-                    <div>
-                      <Button
-                        style={{ marginRight: 12 }}
-                        type="primary"
-                        htmlType="submit"
-                      >
-                        GUARDAR Y CONTINUAR
-                      </Button>
-                      <Link to={"/admin/inventario"}>
-                        <Button type="primary" danger>
-                          REGRESAR
-                        </Button>
-                      </Link>
-                    </div>
-                  </Form.Item>
                 </Col>
                 <Col
-                  md={{ span: 10 }}
+                  md={{ span: 12 }}
                   xl={{ span: 12 }}
-                  lg={{ span: 10 }}
+                  lg={{ span: 12 }}
                   xs={{ span: 24 }}
                 >
                   <div className={"select-item-group-btn"}>
@@ -368,6 +350,27 @@ export default function CreateProduct() {
                       Agregue una nueva
                     </Button>
                   </div>
+                </Col>
+              </Row>
+              <Row gutter={[8,8]}>
+                <Col span={12}>
+
+                  <Form.Item wrapperCol={{ span: 16 }}>
+                    <div>
+                      <Button
+                          style={{ marginRight: 12 }}
+                          type="primary"
+                          htmlType="submit"
+                      >
+                        GUARDAR Y CONTINUAR
+                      </Button>
+                      <Link to={"/admin/inventario"}>
+                        <Button type="primary" danger>
+                          REGRESAR
+                        </Button>
+                      </Link>
+                    </div>
+                  </Form.Item>
                 </Col>
               </Row>
             </Form>
