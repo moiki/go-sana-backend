@@ -8,6 +8,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type LastInvoice struct {
+	InvoiceNumber int64 `bson:"invoice_number"`
+}
+
 func SimpleTablePipeline(perPage int16, page int16, filter string) []bson.D {
 	var matchOrCreate bson.M
 	if filter != "" {
@@ -96,4 +100,42 @@ func GetSimpleTableFromCollection(perPage int16, page int16, filter string, coll
 		return collectionTable, decodeError
 	}
 	return collectionTable, nil
+}
+
+func GetLastInvoicePipeline() []bson.D {
+	pipeline := []bson.M{
+		{
+			"$sort": bson.M{
+				"invoice_number": -1,
+			},
+		},
+		{
+			"$limit": 1,
+		},
+		{
+			"$project": bson.M{
+				"_id":            0,
+				"invoice_number": 1,
+			},
+		},
+	}
+
+	result := utils.ParsePipeline(pipeline)
+
+	return result
+}
+
+func GetLastInvoice(coll *mongo.Collection) (LastInvoice, error) {
+	var lastInvoice []LastInvoice
+
+	_lastInvoice, errLast := coll.Aggregate(connections.DbCtx, mongo.Pipeline(GetLastInvoicePipeline()))
+	if errLast != nil {
+		fmt.Println("aggregate error: ", errLast)
+		return lastInvoice[0], errLast
+	}
+	if decodeError := _lastInvoice.All(connections.DbCtx, &lastInvoice); decodeError != nil {
+		fmt.Println("decodeError error: ", decodeError.Error())
+		return lastInvoice[0], decodeError
+	}
+	return lastInvoice[0], nil
 }
