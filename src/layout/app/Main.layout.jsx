@@ -20,15 +20,7 @@ function Main({children}) {
     const handleFixedNavbar = (type) => setFixed(type);
 
     let {pathname} = useLocation();
-    pathname = pathname.replace("/", "");
-
-    useEffect(() => {
-        if (pathname === "rtl") {
-            setPlacement("left");
-        } else {
-            setPlacement("right");
-        }
-    }, [pathname]);
+    pathname = pathname.replace("/", " ");
 
     return (<Layout
             className={`layout-dashboard ${pathname === "profile" ? "layout-profile" : ""} ${pathname === "rtl" ? "layout-dashboard-rtl" : ""}`}
@@ -40,7 +32,7 @@ function Main({children}) {
                 onClose={() => setVisible(false)}
                 visible={visible}
                 key={placement === "right" ? "left" : "right"}
-                width={250}
+                width={210}
                 className={`drawer-sidebar ${pathname === "rtl" ? "drawer-sidebar-rtl" : ""} `}
             >
                 <Layout
@@ -48,7 +40,7 @@ function Main({children}) {
                 >
                     <Sider
                         trigger={null}
-                        width={250}
+                        width={210}
                         theme="light"
                         className={`sider-primary ant-layout-sider-primary ${sidenavType === "#fff" ? "active-route" : ""}`}
                         style={{background: sidenavType}}

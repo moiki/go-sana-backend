@@ -118,6 +118,11 @@ export default function CreateProduct() {
     await executeService(values);
   };
 
+  const closeLaboratoriesModal = () => {
+    setOpenLaboratory(false);
+    GetLaboratories();
+  };
+
   const closeProviderModal = () => {
     setOpenAddProvider(false);
     GetProviders();
@@ -128,15 +133,10 @@ export default function CreateProduct() {
     GetPresentation();
   };
 
-  const closeLaboratoriesModal = () => {
-    setOpenLaboratory(false);
-    GetLaboratories();
-  };
-
   return (
     <div className="layout-content">
-      <CreateProvider open={openAddProvider} closeModal={closeProviderModal} />
       <CreatePresentation open={openPresentation} closeModal={closePresentationModal} />
+      <CreateProvider open={openAddProvider} closeModal={closeProviderModal} />
       <CreateLab open={openLaboratory} closeModal={closeLaboratoriesModal} />
       <div>
         <Col>

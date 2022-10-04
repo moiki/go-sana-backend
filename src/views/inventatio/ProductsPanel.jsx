@@ -66,7 +66,7 @@ export default function ProductsPanel() {
     });
 
     const searchProduct = element => {
-        console.log(element)
+        // console.log(element)
         setTableParams({...tableParams, filter: element})
     }
 
@@ -127,7 +127,7 @@ export default function ProductsPanel() {
                                 }}
                             >
                                 <h6>Total: {tableInventory.total}</h6>{" "}
-                                <Pagination size="small" total={tableInventory.total} />
+                                <Pagination  size="small" total={tableInventory.total} />
                             </div>
                         </div>
                     </Card>
