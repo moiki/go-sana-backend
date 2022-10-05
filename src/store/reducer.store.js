@@ -1,5 +1,5 @@
-import {initialState} from "./context.store.jsx";
-import actionsStore from "./actions.store.jsx";
+import {initialState} from "./context.store.js";
+import actionsStore from "./actions.store.js";
 
 export default function reducer (state = initialState, action) {
     // console.log(action.type, action.payload)

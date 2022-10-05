@@ -1,4 +1,4 @@
-import {useAuth} from "../../store/context.store.jsx";
+import {useAuth} from "../../store/context.store.js";
 import {useEffect, useState} from "react";
 
 export default function Navbar() {

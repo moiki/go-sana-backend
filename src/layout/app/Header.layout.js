@@ -36,7 +36,7 @@ import {
 
 import {NavLink, Link, useNavigate} from "react-router-dom";
 import styled from "styled-components";
-import {useAuth} from "../../store/context.store.jsx";
+import {useAuth} from "../../store/context.store.js";
 import {logout} from "../../services/auth/login.js";
 
 const ButtonContainer = styled.div`

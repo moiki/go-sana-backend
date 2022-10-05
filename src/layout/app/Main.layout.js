@@ -1,9 +1,9 @@
 import {useState, useEffect} from "react";
 import {useLocation} from "react-router-dom";
 import {Layout, Drawer, Affix} from "antd";
-import Sidenav from "./Sidenav.layout.jsx";
-import Header from "./Header.layout.jsx";
-import Footer from "./Footer.layout.jsx";
+import Sidenav from "./Sidenav.layout.js";
+import Header from "./Header.layout.js";
+import Footer from "./Footer.layout.js";
 
 const {Header: AntHeader, Content, Sider} = Layout;
 

@@ -1,6 +1,6 @@
 import Lottie from "react-lottie";
 import loadingJSON from "../../assets/JSON/cargando.json";
-import GlobalContext, {useAuth} from "../../store/context.store.jsx";
+import GlobalContext, {useAuth} from "../../store/context.store.js";
 import {useContext, useEffect} from "react";
 
 const defaultOptions = {

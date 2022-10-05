@@ -4,8 +4,8 @@ import {PlusCircleOutlined, SearchOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import useGetInventoryTables from "../../customHooks/moduleHooks/inventory/useGetInventoryTables.js";
-import CreateProvider from "./createProvider.jsx";
-import CreateLab from "./createLab.jsx";
+import CreateProvider from "./createProvider.js";
+import CreateLab from "./createLab.js";
 
 const columnsLab = [
     {

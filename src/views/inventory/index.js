@@ -1,8 +1,9 @@
+import React from 'react'
 import {
     Card,
     Tabs,
 } from "antd";
-import ProductsPanel from "./ProductsPanel.jsx";
+import ProductsPanel from "./ProductsPanel.js";
 import LaboratoriesPanel from "./LaboratoriesPanel";
 
 const TabsViews = [
@@ -22,7 +23,6 @@ export default function MainInventory() {
     return  <Card>
         <Tabs
             defaultActiveKey="1"
-
             centered
             items={TabsViews}
         />

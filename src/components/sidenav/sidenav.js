@@ -1,11 +1,11 @@
 import "./sidenav.css"
 import {Link} from "react-router-dom";
-import {useAuth} from "../../store/context.store.jsx";
+import {useAuth} from "../../store/context.store.js";
 
 const adminLinks = [
     {
         name: "Inventario",
-        path: "inventatio",
+        path: "inventory",
         layout: "admin",
         enabled: true
     },

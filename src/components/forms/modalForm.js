@@ -1,6 +1,6 @@
 import {Button, Form, Input, Modal, Radio, Spin} from 'antd';
 import {useAuthorizedApi} from "../../services/auth/rest.js";
-import openNotificationWithIcon from "../alerts/notifications.jsx";
+import openNotificationWithIcon from "../alerts/notifications.js";
 
 export default function ModalForm({ title, open, closeModal, url, callback, children }) {
     const [form] = Form.useForm();

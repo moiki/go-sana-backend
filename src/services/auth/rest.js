@@ -2,9 +2,9 @@ import axios from "axios";
 import config from "../constants/config.js"
 import {useContext, useEffect, useState} from "react";
 import { useNavigate } from 'react-router-dom';
-import GlobalContext, {useAuth} from "../../store/context.store.jsx";
+import GlobalContext, {useAuth} from "../../store/context.store.js";
 import {logout} from "./login.js";
-import actionsStore from "../../store/actions.store.jsx";
+import actionsStore from "../../store/actions.store.js";
 
 const clt = axios.CancelToken;
 const source = clt.source();
@@ -250,7 +250,6 @@ export const CustomAxios = async (
                 data: bodyData,
                 headers: {
                     'Content-Type': contentType.toString(),
-                    ...importHeaders(),
                     Authorization: 'Bearer ' + TOKEN,
                 },
             });
@@ -310,7 +309,6 @@ export const CustomAxiosPromise = (
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: 'Bearer ' + TOKEN,
-                        ...importHeaders(),
                     },
                 });
                 res(response);
