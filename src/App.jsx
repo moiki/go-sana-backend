@@ -1,4 +1,4 @@
-import {useContext, useMemo, useReducer, useState} from 'react'
+import {useReducer} from 'react'
 // import 'bootstrap/dist/css/bootstrap.min.css'
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import Signup from "./components/forms/signup/signup";
@@ -8,7 +8,8 @@ import AuthLayout from "./layout/auth/auth.layout";
 import Login from "./layout/auth/Login.auth.jsx";
 // import {createBrowserHistory} from "history";
 import AppLayout, {LoadContent} from "./layout/app/app.layout";
-import "antd/dist/antd.css";
+// import "antd/dist/antd.css";
+import "antd/dist/antd.min.css"
 import "./assets/styles/main.styles.css";
 import "./assets/styles/responsive.styles.css";
 
