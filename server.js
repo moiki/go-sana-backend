@@ -5,6 +5,7 @@ const app = express();
 const noCache = require('nocache');
 const featurePolicy = require('feature-policy');
 require('dotenv').config();
+const port = process.env.PORT || 3000;
 // var expressStaticGzip = require("compression");
 const expressStaticGzip = require('express-static-gzip');
 //
@@ -31,6 +32,6 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.get('*', function (req, res) {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
-http.createServer(app).listen(3000, () => {
-    console.log("Running frontend from express in http://localhost:3000...")
+http.createServer(app).listen(port, () => {
+    console.log(`Running frontend from express in http://localhost:${port}...`)
 });
