@@ -1,4 +1,3 @@
-import 'dotenv/config'
 
 export default {
     rest_uri_prod: process.env.REACT_APP_REST_DEV_URL,
