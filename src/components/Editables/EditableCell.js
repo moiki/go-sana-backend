@@ -18,6 +18,7 @@ const EditableCell = ({
                           children,
                           dataIndex,
                           record,
+                          inputType,
                           handleSave,
                           ...restProps
                       }) => {
@@ -63,7 +64,9 @@ const EditableCell = ({
                     },
                 ]}
             >
-                <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+                {inputType === 'number' ? <InputNumber ref={inputRef} onPressEnter={save} onBlur={save} />
+                :<Input ref={inputRef} onPressEnter={save} onBlur={save}/>
+                }
             </Form.Item>
         ) : (
             <div

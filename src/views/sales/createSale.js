@@ -1,33 +1,39 @@
 import ModalForm from "../../components/forms/modalForm";
 import {Button, Col, Form, Input, InputNumber, List, Popconfirm, Row, Skeleton, Space, Table, Tooltip} from "antd";
 import {DeleteOutlined, EditOutlined, ProfileOutlined, SearchOutlined, StopOutlined} from "@ant-design/icons";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import ModalContainer from "../../components/containers/modalContainer";
 import EditableCell, {EditableRow} from "../../components/Editables/EditableCell";
+import {sumBy} from "lodash"
+import utilsServices, {PARSE_TEXT} from "../../services/utils.services";
 
 const data = [
     {
         key: 1,
         product: "Cerafon",
         cantidad: 10,
-        subTotal: 100
+        subTotal: 100,
+        price: 10
     },
     {
         key: 2,
         product: "Cerafon",
         cantidad: 10,
-        subTotal: 100
+        subTotal: 100,
+        price: 10
     },
     {
         key: 3,
         product: "Cerafon",
         cantidad: 10,
-        subTotal: 100
+        subTotal: 100,
+        price: 10
     }, {
-    key: 4,
-    product: "Cerafon",
+        key: 4,
+        product: "Cerafon",
         cantidad: 10,
-        subTotal: 100
+        subTotal: 100,
+        price: 10
     },
 
 ];
@@ -36,7 +42,7 @@ export default function CreateSale({open, closeModal, cb}) {
 
     const [saleDetails, setSaleDetails] = useState([...data]);
     const [count, setCount] = useState(5);
-
+    const [totalPayment, setTotalPayment] = useState(0);
 
     const handleAdd = () => {
         const newData = {
@@ -52,9 +58,13 @@ export default function CreateSale({open, closeModal, cb}) {
     const handleSave = (row) => {
         const newData = [...saleDetails];
         const index = newData.findIndex((item) => row.key === item.key);
-        console.log(newData, row)
         const item = newData[index];
-        newData.splice(index, 1, { ...item, ...row });
+        const updated = { ...item, ...row, subTotal: row['cantidad'] * newData[index]['price'] }
+        newData.splice(index, 1, updated);
+        setSaleDetails(newData);
+    };
+    const handleDelete = (key) => {
+        const newData = saleDetails.filter((item) => item.key !== key);
         setSaleDetails(newData);
     };
     const columns = [
@@ -62,6 +72,11 @@ export default function CreateSale({open, closeModal, cb}) {
             title: "Nombre de Producto",
             dataIndex: "product",
             key: "product",
+        },
+        {
+            title: "Precio Unitario",
+            dataIndex: "price",
+            key: "price",
         },
         {
             editable: true,
@@ -73,13 +88,14 @@ export default function CreateSale({open, closeModal, cb}) {
                 editable: true,
                 title: "Cantidad",
                 dataIndex: "cantidad",
+                inputType: "number",
                 handleSave: handleSave,
             }),
-            // render: (text) => (
-            //     <b>
-            //         {`${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            //     </b>
-            // ),
+            render: (text) => (
+                <b>
+                    {`${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                </b>
+            ),
         },
         {
             title: "Sub Total",
@@ -87,23 +103,34 @@ export default function CreateSale({open, closeModal, cb}) {
             dataIndex: "subTotal",
             render: (text) => (
                 <b style={{color: "green"}}>
-                    {`C$ ${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    {utilsServices.ParseNumber(text, PARSE_TEXT.MONEY)}
                 </b>
             ),
         },
         {
             title: 'Opciones',
             key: 'action',
-            render: (_, record) => (
-                <Space size="middle">
-                    <Tooltip title="Quitar producto">
-                        <Button danger={true} type={"link"} shape={"circle"}
-                                icon={<DeleteOutlined size={18} color={"red"}/>}/>
-                    </Tooltip>
-                </Space>
-            ),
+            render: (_, record) =>
+                saleDetails.length >= 1 ? (
+                    <Space size="middle">
+                        <Popconfirm title="¿Desea quitar este producto de la lista?" cancelText={"No"} okText={"Sí"} onConfirm={() => handleDelete(record.key)}>
+                            <Tooltip title="Quitar producto">
+                                <Button danger={true} type={"link"} shape={"circle"}
+                                        icon={<DeleteOutlined size={18} color={"red"}/>}/>
+                            </Tooltip>
+                        </Popconfirm>
+                    </Space>
+                ) : null,
         },
     ]
+
+    useEffect(() => {
+       if (saleDetails.length > 0) {
+           const total = sumBy(saleDetails, "subTotal")
+           setTotalPayment(total)
+       }
+    }, [saleDetails]);
+
 
     return <ModalContainer full={true} open={open} closeModal={closeModal} title={"NUEVA VENTA"}
                       callback={cb}>
@@ -124,10 +151,9 @@ export default function CreateSale({open, closeModal, cb}) {
                         }
                     }}
                     title={() => "PRODUCTOS A FACTURAR"}
-                    footer={() => <b>Total a pagar: C$100</b>}
-                    bordered={true}
+                    footer={() => <b>Total a pagar: {utilsServices.ParseNumber(totalPayment, PARSE_TEXT.MONEY)}</b>}
                     columns={columns}
-                    dataSource={data}
+                    dataSource={saleDetails}
                     pagination={false}
                     scroll={{
                         y: 440,
