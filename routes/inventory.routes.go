@@ -14,6 +14,11 @@ type TableParams struct {
 	Filter  string `query:"filter,omitempty"`
 }
 
+type NameValueParam struct {
+	Property string `json:"property,omitempty"`
+	Value    string `json:"value,omitempty"`
+}
+
 // GetProvidersForSelect Handle providers from inventory
 func GetProvidersForSelect(ctx *fiber.Ctx) error {
 	providers, err := services.ListProviders()
@@ -129,7 +134,6 @@ func AddLabFromInventory(ctx *fiber.Ctx) error {
 func GetProductTable(ctx *fiber.Ctx) error {
 	var params TableParams
 	ctx.QueryParser(&params)
-	fmt.Println(params, ctx.Query("filter"))
 	products, err := services.ListProducts(params.PerPage, params.Page, params.Filter)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -191,6 +195,26 @@ func CreateProduct(ctx *fiber.Ctx) error {
 	})
 }
 
+func GetProductBy(ctx *fiber.Ctx) error {
+	var params NameValueParam
+	if err := ctx.BodyParser(&params); err != nil {
+		ctx.Status(400).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+		return nil
+	}
+
+	result, findError := services.GetProductByProp(params.Value, params.Property)
+	if findError != nil {
+		ctx.Status(400).JSON(&fiber.Map{
+			"error": findError.Error(),
+		})
+		return nil
+	}
+	return ctx.JSON(&fiber.Map{
+		"product": result,
+	})
+}
 func InventoryRoutes(app fiber.Router) {
 	app.Get("/inventory/products-table", middlewares.JWTProtected(), GetProductTable)
 	app.Get("/inventory/labs-table", middlewares.JWTProtected(), GetLabsTable)
@@ -204,4 +228,6 @@ func InventoryRoutes(app fiber.Router) {
 	app.Post("/inventory/provider", middlewares.JWTProtected(), AddProviderFromInventory)
 	app.Post("/inventory/presentation", middlewares.JWTProtected(), AddPresentationFromInventory)
 	app.Post("/inventory/lab", middlewares.JWTProtected(), AddLabFromInventory)
+	// Find Product
+	app.Post("/inventory/find-product", middlewares.JWTProtected(), GetProductBy)
 }

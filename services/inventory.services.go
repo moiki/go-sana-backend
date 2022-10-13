@@ -166,6 +166,17 @@ func CreateProduct(product models.Product) error {
 	return nil
 }
 
+func GetProductByProp(value string, property string) (models.Product, error) {
+	var result models.Product
+	search := bson.M{property: value}
+	fmt.Println(search)
+	err := ProductCollection.FindOne(connections.DbCtx, search).Decode(&result)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
+}
+
 func ListProductPresentationForSelect() ([]models.ProductPresentation, error) {
 	var result []models.ProductPresentation
 
