@@ -1,4 +1,9 @@
 
+export const  DISCOUNT_TYPE = {
+    PERCENT_DISCOUNT: "percent",
+    AMOUNT_DISCOUNT : "amount"
+}
+
 export const COMPARISON = {
     IS_EQUAL: 'equal',
     IS_MAJOR: 'major',
@@ -65,8 +70,14 @@ function ParseNumber(number, type = PARSE_TEXT.QUANTITY, currency = "C$") {
     }
 }
 
+function hasProperties(object) {
+    if (typeof object !== "object" && (object === null || object ===undefined)) return false
+    return Object.keys(object).length > 0
+}
+
 export default {
     checkObjectEquality,
     valueComparison,
-    ParseNumber
+    ParseNumber,
+    hasProperties
 }
