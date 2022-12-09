@@ -4,36 +4,6 @@ import {sumBy} from "lodash";
 import {CustomAxios} from "../auth/rest";
 import openNotificationWithIcon from "../../components/alerts/notifications";
 
-const data = [
-    {
-        key: 1,
-        product: "Cerafon",
-        cantidad: 10,
-        subTotal: 100,
-        price: 10
-    },
-    {
-        key: 2,
-        product: "Cerafon",
-        cantidad: 10,
-        subTotal: 100,
-        price: 10
-    },
-    {
-        key: 3,
-        product: "Cerafon",
-        cantidad: 10,
-        subTotal: 100,
-        price: 10
-    }, {
-        key: 4,
-        product: "Cerafon",
-        cantidad: 10,
-        subTotal: 100,
-        price: 10
-    },
-
-];
 const InitialSaleBody = {
     ClientName: '',
     Amount: 0,
@@ -55,12 +25,12 @@ async function getProductByCode(product_code) {
             openNotificationWithIcon("error", "Ups!", productByCode.error?.message);
         }
         return {
-            product: productByCode.data?.product
+            products: productByCode.data?.products
         }
     } catch (e) {
         openNotificationWithIcon("error", "Error al buscar", e.message);
         return {
-            product: null
+            products: null
         }
     }
 }

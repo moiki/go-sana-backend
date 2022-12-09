@@ -1,33 +1,30 @@
-import ModalForm from "../../components/forms/modalForm";
 import {
-    Badge,
-    Button, Card,
+    Button,
     Col,
     Form,
     Input,
     InputNumber,
-    List,
     Popconfirm, Radio,
     Row,
-    Skeleton,
     Space,
     Table,
     Tooltip
 } from "antd";
-import {DeleteOutlined, EditOutlined, ProfileOutlined, SearchOutlined, StopOutlined} from "@ant-design/icons";
-import React, {useEffect, useState} from "react";
+import {DeleteOutlined, SearchOutlined} from "@ant-design/icons";
+import React, { useState} from "react";
 import ModalContainer from "../../components/containers/modalContainer";
 import EditableCell, {EditableRow} from "../../components/Editables/EditableCell";
 import utilsServices, {DISCOUNT_TYPE, PARSE_TEXT} from "../../services/utils.services";
 import "../../assets/styles/customTables.styles.css"
 import saleServices from "../../services/sales/sales.services";
 import openNotificationWithIcon from "../../components/alerts/notifications";
+import {SearchInput} from "./MiniSearchProduct";
 
 const {useSaleCreation, getProductByCode} = saleServices
 
 export default function CreateSale({open, closeModal}) {
     const [formAddProduct] = Form.useForm();
-    const [productForAdd, setProductForAdd] = useState({});
+    const [productForAdd, setProductForAdd] = useState();
     const {
         handleAddItem,
         saleDetails,
@@ -104,19 +101,14 @@ export default function CreateSale({open, closeModal}) {
 
     const updateQuantityBox = (element) => setProductForAdd({...productForAdd, cantidad: element})
 
-    const onProductSearch = (code) => {
-        getProductByCode(code).then(data => {
-            const newProd = data?.product;
-                setProductForAdd({...newProd, cantidad: 1})
-            formAddProduct.setFieldsValue({
-                name: newProd.name,
-                cantidad: 1,
-                discount_type: DISCOUNT_TYPE.AMOUNT_DISCOUNT,
-                discount: 0
-
-            })
-            })
-            .catch(data => console.log("Product could not be found."))
+    const onProductSearch = async (code) => {
+        try {
+            const result = await getProductByCode(code);
+            return result.products ?? [];
+        } catch (error) {
+            console.log(error.message);
+            return error
+        }
     }
 
     const onAddProduct = () => {
@@ -132,7 +124,7 @@ export default function CreateSale({open, closeModal}) {
                 price: productForAdd.price
             }
             handleAddItem(newItem)
-            setProductForAdd({})
+            setProductForAdd(null)
         }
         formAddProduct.resetFields();
     }
@@ -146,6 +138,18 @@ export default function CreateSale({open, closeModal}) {
                     >
                         <Input/>
                     </Form.Item>
+                </Space>
+                <Space>
+                    <SearchInput
+                        placeholder={"Buscar por nombre o codigo"}
+                        setValue={(newProd)=> {
+                            console.log(newProd)
+                            setProductForAdd({...newProd, cantidad: 1})
+                        }
+                        }
+                        value={productForAdd}
+                        onSearch={onProductSearch}
+                    />
                 </Space>
                 <Table
                     components={{
@@ -167,19 +171,11 @@ export default function CreateSale({open, closeModal}) {
                 />
             </Col>
             <Col xs={24} xxl={6} xl={6} sm={6} md={6} lg={6}>
-                <div style={{marginBottom: "1.2rem"}}>
-                    <Input.Search
-                        size={50}
-                        className="header-search"
-                        placeholder="Escanea el producto..."
-                        onSearch={(text) => console.log(text)}
-                        prefix={<SearchOutlined/>}
-                    />
-                </div>
+
                 <div style={{marginBottom: "1.2rem"}}>
                     <Input.Search
                         className="header-search"
-                        placeholder="Busca por codigo de producto..."
+                        placeholder="Busca por nombre o codigo de producto..."
                         onSearch={onProductSearch}
                         prefix={<SearchOutlined/>}
                     />
@@ -187,8 +183,7 @@ export default function CreateSale({open, closeModal}) {
                 <Form
                     form={formAddProduct}
                     name="addProduct"
-                    wrapperCol={{ span: 16 }}
-                    form={formAddProduct}
+                    wrapperCol={{span: 16}}
                     autoComplete="off"
                 >
                     <Row gutter={[8, 8]} align={"middle"}>
@@ -223,8 +218,8 @@ export default function CreateSale({open, closeModal}) {
                                 />
                             </Form.Item>
                             <Form.Item
-                            label={"Tipo de Descuento"}
-                            name={"discount_type"}
+                                label={"Tipo de Descuento"}
+                                name={"discount_type"}
                             >
                                 <Radio.Group buttonStyle={"solid"}>
                                     <Radio.Button
@@ -233,7 +228,8 @@ export default function CreateSale({open, closeModal}) {
                                         value={DISCOUNT_TYPE.PERCENT_DISCOUNT}>{DISCOUNT_TYPE.PERCENT_DISCOUNT}</Radio.Button>
                                 </Radio.Group>
                             </Form.Item>
-                            <Button block type={"primary"} color={"green"} onClick={onAddProduct}>Agregar a Factura</Button>
+                            <Button block type={"primary"} color={"green"} onClick={onAddProduct}>Agregar a
+                                Factura</Button>
                         </Col>
                     </Row>
                 </Form>
