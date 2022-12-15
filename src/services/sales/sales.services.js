@@ -36,6 +36,7 @@ async function getProductByCode(product_code) {
 }
 
 function useSaleCreation() {
+    const [discount, setDiscount] = useState(0);
     const [saleBody, setSaleBody] = useState(InitialSaleBody);
     const [saleDetails, setSaleDetails] = useState([]);
     const [totalPayment, setTotalPayment] = useState(0);
@@ -81,6 +82,8 @@ function useSaleCreation() {
         handleDeleteItem,
         saleDetails,
         totalPayment,
+        discount,
+        setDiscount,
         saleBody,
         resetBody
     }

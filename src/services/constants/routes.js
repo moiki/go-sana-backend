@@ -2,7 +2,7 @@ import Login from "../../components/forms/login/login.js";
 import HomeView from "../../views/homeView";
 import CreateProduct from "../../views/inventory/createProduct.js";
 import MainInventory from "../../views/inventory";
-import Sales from "../../views/sales";
+import MainSales from "../../views/sales";
 
 export const authRoutes = [
     {
@@ -43,7 +43,7 @@ export const appRoutes = [
         name: 'Ventas',
         isIndex: false,
         mini: 'H',
-        component: Sales,
+        component: MainSales,
         layout: 'admin',
     },
     {

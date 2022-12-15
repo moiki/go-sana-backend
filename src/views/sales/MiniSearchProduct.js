@@ -1,49 +1,42 @@
-import React, { useState } from 'react';
-import { Select } from 'antd';
+import React, {useState} from 'react';
+import {Button, Select} from 'antd';
 import {debounce} from "lodash";
-
 import openNotificationWithIcon from "../../components/alerts/notifications";
+import {PlusOutlined} from "@ant-design/icons";
 
-export const SearchInput = ({placeholder, onSearch, value, setValue}) => {
+export const SearchInput = ({placeholder, onSearch, value, setValue, onAccept, acceptText = 'Agregar'}) => {
     const [data, setData] = useState([]);
-    // const [value, setValue] = useState();
-    const handleSearch = debounce((newValue) => {
-        if (newValue) {
-           onSearch && onSearch(newValue)
-                .then(data => {
-                    console.log(data)
-                    setData(data.map((productElement) => ({
-                        value: productElement.product_code,
-                        label: productElement.name,
-                    })))
-                })
-                .catch(err => openNotificationWithIcon("error", "Ups!", err))
-        } else {
-            setData([]);
-        }
-    },300);
     const handleChange = (newValue) => {
-        console.log(newValue, "TT")
-        setValue(newValue);
+        setValue(data.find(item => item.value === newValue));
+        // onAccept && onAccept(value);
     };
+    const addAction = () => {
+        // openNotificationWithIcon('info', "hola")
+        onAccept && onAccept(value)
+    }
+    const renderOptions = () => data.map((optionSelect, index) => {
+        return <Select.Option key={index} value={optionSelect?.value || ''}>
+            {optionSelect.label}
+        </Select.Option>
+    })
     return (
-        <Select
-            showSearch
-            value={value}
-            placeholder={placeholder}
-            style={{
-                width: 200,
-            }}
-            defaultActiveFirstOption={false}
-            showArrow={false}
-            filterOption={false}
-            onSearch={handleSearch}
-            onChange={handleChange}
-            notFoundContent={null}
-            options={data.map((productElement) => ({
-                value: productElement.product_code,
-                label: productElement.name,
-            }))}
-        />
+        <div>
+            <Select
+                showSearch
+                value={value?.value || null}
+                placeholder={placeholder}
+                style={{
+                    width: 240,
+                }}
+                // defaultActiveFirstOption={false}
+                // showArrow={false}
+                filterOption={false}
+                onSearch={(value)=> onSearch(value, setData)}
+                onChange={handleChange}
+            >
+                {renderOptions()}
+            </Select>
+            <Button icon={<PlusOutlined />} type={"primary"} onClick={addAction}>{acceptText}</Button>
+        </div>
     );
 };

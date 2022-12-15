@@ -1,28 +1,45 @@
 import {
-    Button,
+    Button, Checkbox,
     Col,
     Form,
-    Input,
-    InputNumber,
-    Popconfirm, Radio,
+    Input, InputNumber,
+    Modal,
+    Popconfirm,
     Row,
     Space,
     Table,
     Tooltip
 } from "antd";
 import {DeleteOutlined, SearchOutlined} from "@ant-design/icons";
-import React, { useState} from "react";
-import ModalContainer from "../../components/containers/modalContainer";
+import React, {useState} from "react";
+// import ModalContainer from "../../components/containers/modalContainer";
 import EditableCell, {EditableRow} from "../../components/Editables/EditableCell";
 import utilsServices, {DISCOUNT_TYPE, PARSE_TEXT} from "../../services/utils.services";
 import "../../assets/styles/customTables.styles.css"
 import saleServices from "../../services/sales/sales.services";
 import openNotificationWithIcon from "../../components/alerts/notifications";
 import {SearchInput} from "./MiniSearchProduct";
+import Card from "antd/lib/card/Card";
+import {debounce} from "lodash";
 
-const {useSaleCreation, getProductByCode} = saleServices
+const {useSaleCreation, getProductByCode} = saleServices;
 
-export default function CreateSale({open, closeModal}) {
+const _config = {
+    title: (<><b>Confirmación de venta</b></>),
+    content: (
+        <>
+            <p style={{fontSize: 18}}>¿Seguro que desea guardar esta venta?</p>
+        </>
+    ),
+    okText: 'Sí',
+    cancelText: 'No',
+    onOk: () => {
+       console.log("nextProps.file");
+    },
+};
+
+export default function CreateSale() {
+    const [hasDiscount, setHasDiscount] = useState(false);
     const [formAddProduct] = Form.useForm();
     const [productForAdd, setProductForAdd] = useState();
     const {
@@ -31,7 +48,9 @@ export default function CreateSale({open, closeModal}) {
         handleDeleteItem,
         handleSaveItem,
         totalPayment,
-        resetBody
+        resetBody,
+        discount,
+        setDiscount
     } = useSaleCreation()
 
     const columns = [
@@ -101,27 +120,29 @@ export default function CreateSale({open, closeModal}) {
 
     const updateQuantityBox = (element) => setProductForAdd({...productForAdd, cantidad: element})
 
-    const onProductSearch = async (code) => {
-        try {
-            const result = await getProductByCode(code);
-            return result.products ?? [];
-        } catch (error) {
-            console.log(error.message);
-            return error
+    const handleSearch = debounce((newValue, setData) => {
+        if (newValue) {
+            getProductByCode(newValue)
+                .then(data => {
+                    const productList = data.products ?? []
+                    setData(productList.map(item => ({...item, value: item.product_code, label: item.name})))
+                })
+                .catch(err => openNotificationWithIcon("error", "Ups!", err))
+        } else {
+            setData([]);
         }
-    }
+    }, 300);
 
-    const onAddProduct = () => {
-        const dataFromForm = formAddProduct.getFieldsValue()
-        if (!utilsServices.hasProperties(productForAdd)) {
+    const onAddProduct = (product) => {
+        if (!utilsServices.hasProperties(product)) {
             openNotificationWithIcon("error", "Item no valido", "Verifique el producto")
         } else {
             const newItem = {
-                key: productForAdd?.product_code,
-                product: productForAdd.name,
-                cantidad: dataFromForm?.cantidad || 1,
-                subTotal: productForAdd.price * (dataFromForm?.cantidad || 1),
-                price: productForAdd.price
+                key: product?.product_code,
+                product: product.name,
+                cantidad: 1,
+                subTotal: product.price,
+                price: product.price
             }
             handleAddItem(newItem)
             setProductForAdd(null)
@@ -129,28 +150,47 @@ export default function CreateSale({open, closeModal}) {
         formAddProduct.resetFields();
     }
 
-    return <ModalContainer full={true} open={open} closeModal={closeModal} title={"NUEVA VENTA"} callback={resetBody}>
+    return <Card title={"NUEVA VENTA"} extra={<Button type={"primary"} onClick={()=> {
+        Modal.confirm(_config)
+    }}>Generar Venta</Button>}>
         <Row gutter={[24, 0]}>
-            <Col xs={24} xxl={18} xl={18} sm={24} md={18} lg={18}>
-                <Space>
-                    <Form.Item
-                        label={"Nombre de Cliente"}
-                    >
-                        <Input/>
-                    </Form.Item>
-                </Space>
-                <Space>
-                    <SearchInput
-                        placeholder={"Buscar por nombre o codigo"}
-                        setValue={(newProd)=> {
-                            console.log(newProd)
-                            setProductForAdd({...newProd, cantidad: 1})
-                        }
-                        }
-                        value={productForAdd}
-                        onSearch={onProductSearch}
-                    />
-                </Space>
+            <Col span={24}>
+               <Row>
+                   <Col span={24}>
+                       <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                           <Form.Item
+                               label={"Nombre de Cliente"}
+                           >
+                               <Input/>
+                           </Form.Item>
+                           <div style={{marginBottom: "1.2rem"}}>
+                               <Space>
+                                   <SearchInput
+                                       placeholder={"Buscar por nombre o codigo"}
+                                       setValue={(newProd) => {
+                                           console.log(newProd)
+                                           setProductForAdd({...newProd, cantidad: 1})
+                                       }
+                                       }
+                                       value={productForAdd}
+                                       onSearch={handleSearch}
+                                       acceptText={"Agregar a Factura"}
+                                       onAccept={onAddProduct}
+                                   />
+                               </Space>
+                           </div>
+                       </div>
+                   </Col>
+               </Row>
+                <Row>
+                    <Col span={24} aria-disabled={hasDiscount}>
+                        <Input.Group>
+                            <Checkbox value={hasDiscount} onChange={()=> setHasDiscount(!hasDiscount)}>Agregar Descuento</Checkbox>
+                            <InputNumber value={discount} min={0} disabled={!hasDiscount} onChange={(e)=>setDiscount(e)}/>
+                        </Input.Group>
+                    </Col>
+                </Row>
+
                 <Table
                     components={{
                         body: {
@@ -159,7 +199,6 @@ export default function CreateSale({open, closeModal}) {
                         }
                     }}
                     rowClassName={() => 'editable-row'}
-                    title={() => "PRODUCTOS A FACTURAR"}
                     footer={() => <b>Total a pagar: {utilsServices.ParseNumber(totalPayment, PARSE_TEXT.MONEY)}</b>}
                     columns={columns}
                     dataSource={saleDetails}
@@ -170,76 +209,7 @@ export default function CreateSale({open, closeModal}) {
 
                 />
             </Col>
-            <Col xs={24} xxl={6} xl={6} sm={6} md={6} lg={6}>
-
-                <div style={{marginBottom: "1.2rem"}}>
-                    <Input.Search
-                        className="header-search"
-                        placeholder="Busca por nombre o codigo de producto..."
-                        onSearch={onProductSearch}
-                        prefix={<SearchOutlined/>}
-                    />
-                </div>
-                <Form
-                    form={formAddProduct}
-                    name="addProduct"
-                    wrapperCol={{span: 16}}
-                    autoComplete="off"
-                >
-                    <Row gutter={[8, 8]} align={"middle"}>
-                        <Col span={24}>
-                            <Form.Item
-                                name="name"
-                                style={{marginRight: "2rem"}}
-                                label="Producto"
-                            >
-                                <Input disabled/>
-                            </Form.Item>
-                            <Form.Item label="Cantidad" name="cantidad" required>
-                                <InputNumber
-                                    defaultValue={0}
-                                    min={0}
-                                    onChange={updateQuantityBox}
-                                    formatter={(value) =>
-                                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                    }
-                                    parser={(value) => value.replace(/(,*)/g, "")}
-                                />
-                            </Form.Item>
-                            <Form.Item label="Descuento" name="discount" required>
-                                <InputNumber
-                                    defaultValue={0}
-                                    min={0}
-                                    // value={cantidad.value}
-                                    formatter={(value) =>
-                                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                    }
-                                    parser={(value) => value.replace(/(,*)/g, "")}
-                                />
-                            </Form.Item>
-                            <Form.Item
-                                label={"Tipo de Descuento"}
-                                name={"discount_type"}
-                            >
-                                <Radio.Group buttonStyle={"solid"}>
-                                    <Radio.Button
-                                        value={DISCOUNT_TYPE.AMOUNT_DISCOUNT}>{DISCOUNT_TYPE.AMOUNT_DISCOUNT}</Radio.Button>
-                                    <Radio.Button
-                                        value={DISCOUNT_TYPE.PERCENT_DISCOUNT}>{DISCOUNT_TYPE.PERCENT_DISCOUNT}</Radio.Button>
-                                </Radio.Group>
-                            </Form.Item>
-                            <Button block type={"primary"} color={"green"} onClick={onAddProduct}>Agregar a
-                                Factura</Button>
-                        </Col>
-                    </Row>
-                </Form>
-
-                {/*<Form.Item name="direction" label="Agrega un comentario">*/}
-                {/*    <Input.TextArea type="textarea"/>*/}
-                {/*</Form.Item>*/}
-
-            </Col>
         </Row>
 
-    </ModalContainer>
+    </Card>
 }
