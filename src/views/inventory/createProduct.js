@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Card, Col, Form, Input, InputNumber, Row, Select } from "antd";
 import { useAuthorizedApi } from "../../services/auth/rest.js";
 import openNotificationWithIcon from "../../components/alerts/notifications.js";
 import { Link } from "react-router-dom";
-import AddProvider from "../../components/forms/providers/addProvider.js";
 import "../../assets/styles/customForm.styles.css";
 import CreateProvider from "./createProvider";
 import CreatePresentation from "./createPresentation";
-import {set} from "react-hook-form";
 import CreateLab from "./createLab";
 
 const validatePrimeNumber = (number) => {

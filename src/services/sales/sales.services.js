@@ -11,7 +11,7 @@ const InitialSaleBody = {
     Commentary: '',
     PaidWith: 0,
     Change: 0,
-    DiscountType: DISCOUNT_TYPE.AMOUNT_DISCOUNT,
+    DiscountType: DISCOUNT_TYPE.PERCENT_DISCOUNT,
     Discount: 0
 }
 
@@ -40,7 +40,9 @@ function useSaleCreation() {
     const [saleBody, setSaleBody] = useState(InitialSaleBody);
     const [saleDetails, setSaleDetails] = useState([]);
     const [totalPayment, setTotalPayment] = useState(0);
-    const changeBodyValue = (value, name) => setSaleBody({...saleBody, [name]: value});
+    const changeBodyValue = (value, name) => {
+        setSaleBody({...saleBody, [name]: value});
+    }
 
     const setDiscountType = (event) => changeBodyValue(event.target.value, 'DiscountType');
 
@@ -70,7 +72,9 @@ function useSaleCreation() {
     useEffect(() => {
         if (saleDetails.length > 0) {
             const total = sumBy(saleDetails, "subTotal")
-            setTotalPayment(total)
+            // setTotalPayment(total);
+            changeBodyValue(total, "Amount");
+            changeBodyValue(saleDetails, "Details");
         }
     }, [saleDetails]);
 
@@ -85,7 +89,8 @@ function useSaleCreation() {
         discount,
         setDiscount,
         saleBody,
-        resetBody
+        resetBody,
+        changeBodyValue
     }
 }
 

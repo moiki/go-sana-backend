@@ -10,8 +10,8 @@ import {
     Table,
     Tooltip
 } from "antd";
-import {DeleteOutlined, SearchOutlined} from "@ant-design/icons";
-import React, {useState} from "react";
+import {DeleteOutlined, PercentageOutlined, SearchOutlined} from "@ant-design/icons";
+import React, {useEffect, useState} from "react";
 // import ModalContainer from "../../components/containers/modalContainer";
 import EditableCell, {EditableRow} from "../../components/Editables/EditableCell";
 import utilsServices, {DISCOUNT_TYPE, PARSE_TEXT} from "../../services/utils.services";
@@ -24,20 +24,6 @@ import {debounce} from "lodash";
 
 const {useSaleCreation, getProductByCode} = saleServices;
 
-const _config = {
-    title: (<><b>Confirmación de venta</b></>),
-    content: (
-        <>
-            <p style={{fontSize: 18}}>¿Seguro que desea guardar esta venta?</p>
-        </>
-    ),
-    okText: 'Sí',
-    cancelText: 'No',
-    onOk: () => {
-       console.log("nextProps.file");
-    },
-};
-
 export default function CreateSale() {
     const [hasDiscount, setHasDiscount] = useState(false);
     const [formAddProduct] = Form.useForm();
@@ -48,7 +34,9 @@ export default function CreateSale() {
         handleDeleteItem,
         handleSaveItem,
         totalPayment,
+        saleBody,
         resetBody,
+        changeBodyValue,
         discount,
         setDiscount
     } = useSaleCreation()
@@ -118,8 +106,6 @@ export default function CreateSale() {
         },
     ]
 
-    const updateQuantityBox = (element) => setProductForAdd({...productForAdd, cantidad: element})
-
     const handleSearch = debounce((newValue, setData) => {
         if (newValue) {
             getProductByCode(newValue)
@@ -150,6 +136,47 @@ export default function CreateSale() {
         formAddProduct.resetFields();
     }
 
+    useEffect(() => {
+        console.log(saleBody)
+    }, [saleBody]);
+    const _config = {
+        title: (<><b>Confirmación de venta</b></>),
+        content: (
+            <div>
+                <p style={{fontSize: 18}}>¿Seguro que desea guardar esta venta?</p>
+                <Form.Item
+                    label="Paga con"
+                    name="PaidWith"
+                >
+                    <InputNumber
+                        min={0}
+                        value={saleBody.PaidWith}
+                        onChange={data => {
+                            changeBodyValue(Number(data),"PaidWith")
+                            changeBodyValue(Math.abs(Number(data) - saleBody.Amount),"Change")
+                        }}
+                        formatter={(value) =>
+                            `C$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                        }
+                        parser={(value) => value.replace(/C\$\s?|(,*)/g, "")}
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    label="Vuelto"
+                    name="Change"
+                >
+                    <b>{`C$ ${saleBody.Change}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b>
+                </Form.Item>
+            </div>
+        ),
+        okText: 'Sí',
+        cancelText: 'No',
+        onOk: () => {
+            console.log("nextProps.file");
+        },
+    };
+
     return <Card title={"NUEVA VENTA"} extra={<Button type={"primary"} onClick={()=> {
         Modal.confirm(_config)
     }}>Generar Venta</Button>}>
@@ -161,14 +188,13 @@ export default function CreateSale() {
                            <Form.Item
                                label={"Nombre de Cliente"}
                            >
-                               <Input/>
+                               <Input value={saleBody.ClientName} onChange={(data => changeBodyValue(data.target.value,"ClientName"))}/>
                            </Form.Item>
                            <div style={{marginBottom: "1.2rem"}}>
                                <Space>
                                    <SearchInput
                                        placeholder={"Buscar por nombre o codigo"}
                                        setValue={(newProd) => {
-                                           console.log(newProd)
                                            setProductForAdd({...newProd, cantidad: 1})
                                        }
                                        }
@@ -186,7 +212,13 @@ export default function CreateSale() {
                     <Col span={24} aria-disabled={hasDiscount}>
                         <Input.Group>
                             <Checkbox value={hasDiscount} onChange={()=> setHasDiscount(!hasDiscount)}>Agregar Descuento</Checkbox>
-                            <InputNumber value={discount} min={0} disabled={!hasDiscount} onChange={(e)=>setDiscount(e)}/>
+                            <InputNumber
+                                value={saleBody.Discount}
+                                onChange={(data => changeBodyValue(data.target.value,"Discount"))}
+                                min={0}
+                                disabled={!hasDiscount}
+                            />
+                            <PercentageOutlined style={{marginLeft:10}} />
                         </Input.Group>
                     </Col>
                 </Row>
@@ -199,15 +231,23 @@ export default function CreateSale() {
                         }
                     }}
                     rowClassName={() => 'editable-row'}
-                    footer={() => <b>Total a pagar: {utilsServices.ParseNumber(totalPayment, PARSE_TEXT.MONEY)}</b>}
+                    footer={() => <b>Total a pagar: {utilsServices.ParseNumber(saleBody.Amount, PARSE_TEXT.MONEY)}</b>}
                     columns={columns}
                     dataSource={saleDetails}
                     pagination={false}
                     scroll={{
                         y: 300,
                     }}
-
                 />
+            </Col>
+        </Row>
+        <Row>
+            <Col span={24}>
+                <Form.Item
+                    label={"Notas acerca de la venta"}
+                >
+                    <Input.TextArea allowClear={true} size={"middle"} value={saleBody.Commentary} onChange={(data => changeBodyValue(data.target.value,"Commentary"))}/>
+                </Form.Item>
             </Col>
         </Row>
 
