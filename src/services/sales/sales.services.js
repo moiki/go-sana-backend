@@ -42,6 +42,17 @@ function useSaleCreation() {
     const [totalPayment, setTotalPayment] = useState(0);
     const changeBodyValue = (value, name) => {
         setSaleBody({...saleBody, [name]: value});
+    };
+    const changeBodyValueByObject = (body) => {
+        console.log(body)
+        let hasUnknownElement = false;
+        Object.keys(body).forEach(inc => {
+            if (!Object.keys(InitialSaleBody).some(key => key === inc)) {
+                console.error('Invalid value Key: ', inc);
+                hasUnknownElement = true;
+            }
+        })
+        if (!hasUnknownElement) setSaleBody({...saleBody, ...body});
     }
 
     const setDiscountType = (event) => changeBodyValue(event.target.value, 'DiscountType');
@@ -73,8 +84,9 @@ function useSaleCreation() {
         if (saleDetails.length > 0) {
             const total = sumBy(saleDetails, "subTotal")
             // setTotalPayment(total);
-            changeBodyValue(total, "Amount");
-            changeBodyValue(saleDetails, "Details");
+            // changeBodyValue(total, "Amount");
+            // changeBodyValue(saleDetails, "Details");
+            setSaleBody({...saleBody, Amount: total, Details: saleDetails});
         }
     }, [saleDetails]);
 
@@ -90,7 +102,8 @@ function useSaleCreation() {
         setDiscount,
         saleBody,
         resetBody,
-        changeBodyValue
+        changeBodyValue,
+        changeBodyValueByObject
     }
 }
 

@@ -21,12 +21,14 @@ import openNotificationWithIcon from "../../components/alerts/notifications";
 import {SearchInput} from "./MiniSearchProduct";
 import Card from "antd/lib/card/Card";
 import {debounce} from "lodash";
+import ConfirmSale from "./confirmSale";
 
 const {useSaleCreation, getProductByCode} = saleServices;
 
 export default function CreateSale() {
     const [hasDiscount, setHasDiscount] = useState(false);
     const [formAddProduct] = Form.useForm();
+    const [openConfirm, setOpenConfirm] = useState(false);
     const [productForAdd, setProductForAdd] = useState();
     const {
         handleAddItem,
@@ -37,6 +39,7 @@ export default function CreateSale() {
         saleBody,
         resetBody,
         changeBodyValue,
+        changeBodyValueByObject,
         discount,
         setDiscount
     } = useSaleCreation()
@@ -136,89 +139,54 @@ export default function CreateSale() {
         formAddProduct.resetFields();
     }
 
-    useEffect(() => {
-        console.log(saleBody)
-    }, [saleBody]);
-    const _config = {
-        title: (<><b>Confirmación de venta</b></>),
-        content: (
-            <div>
-                <p style={{fontSize: 18}}>¿Seguro que desea guardar esta venta?</p>
-                <Form.Item
-                    label="Paga con"
-                    name="PaidWith"
-                >
-                    <InputNumber
-                        min={0}
-                        value={saleBody.PaidWith}
-                        onChange={data => {
-                            changeBodyValue(Number(data),"PaidWith")
-                            changeBodyValue(Math.abs(Number(data) - saleBody.Amount),"Change")
-                        }}
-                        formatter={(value) =>
-                            `C$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        }
-                        parser={(value) => value.replace(/C\$\s?|(,*)/g, "")}
-                    />
-                </Form.Item>
-
-                <Form.Item
-                    label="Vuelto"
-                    name="Change"
-                >
-                    <b>{`C$ ${saleBody.Change}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b>
-                </Form.Item>
-            </div>
-        ),
-        okText: 'Sí',
-        cancelText: 'No',
-        onOk: () => {
-            console.log("nextProps.file");
-        },
-    };
-
-    return <Card title={"NUEVA VENTA"} extra={<Button type={"primary"} onClick={()=> {
-        Modal.confirm(_config)
+    return <Card title={"NUEVA VENTA"} extra={<Button type={"primary"} onClick={() => {
+        setOpenConfirm(true);
     }}>Generar Venta</Button>}>
+        <ConfirmSale open={openConfirm} Change={saleBody.Change} Amount={saleBody.Amount}
+                     onChangePaid={changeBodyValueByObject} PaidWith={saleBody.PaidWith}
+                     closeModal={()=> setOpenConfirm(false)}
+        />
         <Row gutter={[24, 0]}>
             <Col span={24}>
-               <Row>
-                   <Col span={24}>
-                       <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-                           <Form.Item
-                               label={"Nombre de Cliente"}
-                           >
-                               <Input value={saleBody.ClientName} onChange={(data => changeBodyValue(data.target.value,"ClientName"))}/>
-                           </Form.Item>
-                           <div style={{marginBottom: "1.2rem"}}>
-                               <Space>
-                                   <SearchInput
-                                       placeholder={"Buscar por nombre o codigo"}
-                                       setValue={(newProd) => {
-                                           setProductForAdd({...newProd, cantidad: 1})
-                                       }
-                                       }
-                                       value={productForAdd}
-                                       onSearch={handleSearch}
-                                       acceptText={"Agregar a Factura"}
-                                       onAccept={onAddProduct}
-                                   />
-                               </Space>
-                           </div>
-                       </div>
-                   </Col>
-               </Row>
+                <Row>
+                    <Col span={24}>
+                        <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                            <Form.Item
+                                label={"Nombre de Cliente"}
+                            >
+                                <Input value={saleBody.ClientName}
+                                       onChange={(data => changeBodyValue(data.target.value, "ClientName"))}/>
+                            </Form.Item>
+                            <div style={{marginBottom: "1.2rem"}}>
+                                <Space>
+                                    <SearchInput
+                                        placeholder={"Buscar por nombre o codigo"}
+                                        setValue={(newProd) => {
+                                            setProductForAdd({...newProd, cantidad: 1})
+                                        }
+                                        }
+                                        value={productForAdd}
+                                        onSearch={handleSearch}
+                                        acceptText={"Agregar a Factura"}
+                                        onAccept={onAddProduct}
+                                    />
+                                </Space>
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
                 <Row>
                     <Col span={24} aria-disabled={hasDiscount}>
                         <Input.Group>
-                            <Checkbox value={hasDiscount} onChange={()=> setHasDiscount(!hasDiscount)}>Agregar Descuento</Checkbox>
+                            <Checkbox value={hasDiscount} onChange={() => setHasDiscount(!hasDiscount)}>Agregar
+                                Descuento</Checkbox>
                             <InputNumber
                                 value={saleBody.Discount}
-                                onChange={(data => changeBodyValue(data.target.value,"Discount"))}
+                                onChange={(data => changeBodyValue(data.target.value, "Discount"))}
                                 min={0}
                                 disabled={!hasDiscount}
                             />
-                            <PercentageOutlined style={{marginLeft:10}} />
+                            <PercentageOutlined style={{marginLeft: 10}}/>
                         </Input.Group>
                     </Col>
                 </Row>
@@ -246,7 +214,8 @@ export default function CreateSale() {
                 <Form.Item
                     label={"Notas acerca de la venta"}
                 >
-                    <Input.TextArea allowClear={true} size={"middle"} value={saleBody.Commentary} onChange={(data => changeBodyValue(data.target.value,"Commentary"))}/>
+                    <Input.TextArea allowClear={true} size={"middle"} value={saleBody.Commentary}
+                                    onChange={(data => changeBodyValue(data.target.value, "Commentary"))}/>
                 </Form.Item>
             </Col>
         </Row>
