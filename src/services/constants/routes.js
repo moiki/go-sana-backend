@@ -1,6 +1,6 @@
 import Login from "../../components/forms/login/login.js";
 import HomeView from "../../views/homeView";
-import CreateProduct from "../../views/inventory/createProduct.js";
+import CreateProduct from "../../views/inventory/createProduct";
 import MainInventory from "../../views/inventory";
 import MainSales from "../../views/sales";
 

@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+/* *********** Form Styles ************** */
+
+.form-product {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.form-product > div {
+  margin: .1rem;
+  min-width: 100%;
+}
+.product-main-action {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 10px;
+}
+.product-main-action a {
+  width: fit-content !important;
+  margin-left: 5px;
+}

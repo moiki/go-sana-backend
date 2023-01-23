@@ -1,6 +1,6 @@
 import {Modal} from "antd";
 
-export default function ModalContainer({ title, open, closeModal, callback, children, full }) {
+export default function ModalContainer({title, open, closeModal, callback, children, full}) {
 
     return <Modal
         title={title}
@@ -8,12 +8,12 @@ export default function ModalContainer({ title, open, closeModal, callback, chil
         okText="Aceptar"
         cancelText={"Cancelar"}
         okButtonProps={{name: "Cerrar"}}
-        className={full ?"full-modal": ""}
-        bodyStyle={ full? {height: "calc(100vh - 110px)"}: {}}
+        className={full ? "full-modal" : ""}
+        bodyStyle={full ? {height: "calc(100vh - 110px)"} : {}}
         onCancel={closeModal}
         destroyOnClose={true}
-        onOk={()=> {
-        callback && callback()
+        onOk={() => {
+            callback && callback()
         }
         }
     >
