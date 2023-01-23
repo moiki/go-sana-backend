@@ -166,14 +166,32 @@ func CreateProduct(product models.Product) error {
 	return nil
 }
 
-func GetProductByProp(value string, property string) (models.Product, error) {
-	var result models.Product
-	search := bson.M{property: value}
-	fmt.Println(search)
-	err := ProductCollection.FindOne(connections.DbCtx, search).Decode(&result)
+func GetProductByNameOrCode(value string) ([]bson.M, error) {
+	var result []bson.M
+	search := bson.M{
+		"$or": bson.A{
+			bson.M{
+				"product_code": bson.M{
+					"$eq": value,
+				},
+			},
+			bson.M{
+				"$text": bson.M{
+					"$search": value,
+				},
+			},
+		},
+	}
+	//fmt.Println(search)
+	data, err := ProductCollection.Find(connections.DbCtx, search) //.Decode(&result)
 	if err != nil {
 		return result, err
 	}
+	errDecode := data.All(connections.DbCtx, &result)
+	if errDecode != nil {
+		return nil, errDecode
+	}
+	fmt.Println(result)
 	return result, nil
 }
 

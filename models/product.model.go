@@ -25,6 +25,12 @@ var ProductIndex = []mongo.IndexModel{
 	},
 }
 
+type Price struct {
+	Type        string  `bson:"type" json:"type,omitempty"`
+	Amount      float64 `bson:"amount" json:"amount,omitempty"`
+	Description string  `bson:"description" json:"description,omitempty"`
+}
+
 type Product struct {
 	ProductId             string    `json:"product_id,omitempty" validate:"required" bson:"product_id"`
 	LaboratoryId          string    `json:"laboratory_id,omitempty" validate:"required" bson:"laboratory_id"`
@@ -33,11 +39,10 @@ type Product struct {
 	Name                  string    `json:"name,omitempty" validate:"required" bson:"name"`
 	ProductCode           string    `json:"product_code,omitempty" validate:"required" bson:"product_code"`
 	Price                 float64   `json:"price,omitempty" validate:"required" bson:"price"`
+	PriceNotes            string    `json:"price_notes,omitempty" validate:"required" bson:"price_notes"`
 	BoxPrice              float64   `json:"box_price,omitempty" bson:"box_price"`
 	Image                 string    `json:"image,omitempty" bson:"image"`
 	Lot                   int64     `json:"lot,omitempty" bson:"lot"`
-	Quantity              int64     `json:"quantity,omitempty" validate:"required" bson:"quantity"`
-	BoxQuantity           int64     `json:"box_quantity,omitempty" validate:"required" bson:"box_quantity"`
 	IsActive              bool      `json:"is_active,omitempty" validate:"required" bson:"is_active"`
 	CreatedAt             time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt             time.Time `json:"updated_at" bson:"updated_at"`

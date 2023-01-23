@@ -28,6 +28,7 @@ _testmain.go
 
 # Directory-based project format:
 .idea/
+.fleet/
 .idea/workspace.xml
 **/.idea/workspace.xml
 

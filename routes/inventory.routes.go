@@ -195,6 +195,7 @@ func CreateProduct(ctx *fiber.Ctx) error {
 	})
 }
 
+// GetProductBy Get product by name or code /**
 func GetProductBy(ctx *fiber.Ctx) error {
 	var params NameValueParam
 	if err := ctx.BodyParser(&params); err != nil {
@@ -204,7 +205,7 @@ func GetProductBy(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	result, findError := services.GetProductByProp(params.Value, params.Property)
+	result, findError := services.GetProductByNameOrCode(params.Value)
 	if findError != nil {
 		ctx.Status(400).JSON(&fiber.Map{
 			"error": findError.Error(),
@@ -212,7 +213,7 @@ func GetProductBy(ctx *fiber.Ctx) error {
 		return nil
 	}
 	return ctx.JSON(&fiber.Map{
-		"product": result,
+		"products": result,
 	})
 }
 func InventoryRoutes(app fiber.Router) {

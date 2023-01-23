@@ -65,6 +65,6 @@ func (l Sale) NewSale() Sale {
 		l.Currency = "C$"
 	}
 	l.Discount = 0
-	l.DiscountType = AMOUNT_DISCOUNT
+	l.DiscountType = PERCENT_DISCOUNT
 	return l
 }
