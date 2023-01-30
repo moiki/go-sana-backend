@@ -7,6 +7,7 @@ import (
 	"go-sana-blackend/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 	//"go-sana-blackend/models"
 )
 
@@ -155,6 +156,10 @@ func ListProducts(perPage int16, page int16, filter string) ([]bson.M, error) {
 }
 
 func CreateProduct(product models.Product) error {
+	for _, price := range product.Prices {
+		price.CreatedAt = time.Now()
+		price.IsActive = true
+	}
 	validationError := utils.ModelValidation.Struct(product)
 	if validationError != nil {
 		return validationError
