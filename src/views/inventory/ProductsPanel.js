@@ -4,6 +4,7 @@ import {Button, Card, Col, Input, Pagination, Table} from "antd";
 import {PlusCircleOutlined, SearchOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
 import moment from "moment/moment.js";
+import {PRICE_TYPE} from "./addPrice";
 
 const columns = [
     {
@@ -73,7 +74,16 @@ export default function ProductsPanel() {
     useEffect(() => {
         if (data?.data) {
             const newState = data?.data?.shift();
-            setTableInventory({ ...newState });
+            const tableState = {
+                ...newState,
+                docs: newState.docs.map(item => {
+                    return {
+                        ...item,
+                        price: item.prices.find(p => p.type === PRICE_TYPE.UNIT)?.amount || 0
+                    }
+                })
+            }
+            setTableInventory(tableState);
         }
     }, [data]);
 

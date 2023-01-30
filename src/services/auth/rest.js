@@ -286,21 +286,19 @@ export const CustomAxios = async (
  * @param {string} url endpoint url for request
  * @param {object} bodyData body object in case of a non-get method
  * @param {string} method "GET"|POST"|"PUT"|"DELETE"
- * @param {string} contentType [Optional] Content type
  * @returns {Promise<void>} Promise
  */
 export const CustomAxiosPromise = (
     url = '',
     bodyData = {},
     method = 'post',
-    authToken = null
 ) => {
     return new Promise(async (res, rej) => {
         try {
             const isLogin = await verifyTokenLogin();
 
-            if (isLogin || authToken) {
-                const TOKEN = authToken ? authToken : localStorage.getItem('token');
+            if (isLogin) {
+                const TOKEN = localStorage.getItem('token');
 
                 const response = await instanceAxios({
                     method: method,
