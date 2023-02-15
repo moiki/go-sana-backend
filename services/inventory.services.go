@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"go-sana-blackend/connections"
 	"go-sana-blackend/models"
 	"go-sana-blackend/utils"
@@ -156,9 +157,11 @@ func ListProducts(perPage int16, page int16, filter string) ([]bson.M, error) {
 }
 
 func CreateProduct(product models.Product) error {
-	for _, price := range product.Prices {
-		price.CreatedAt = time.Now()
-		price.IsActive = true
+	for index := range product.Prices {
+		product.Prices[index].IdPrice = uuid.New().String()
+		product.Prices[index].IdProduct = product.ProductId
+		product.Prices[index].CreatedAt = time.Now()
+		product.Prices[index].IsActive = true
 	}
 	validationError := utils.ModelValidation.Struct(product)
 	if validationError != nil {

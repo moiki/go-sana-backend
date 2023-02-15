@@ -5,6 +5,8 @@ import (
 )
 
 type Price struct {
+	IdPrice     string    `json:"id_price,omitempty" bson:"id_price"`
+	IdProduct   string    `json:"id_product,omitempty" bson:"id_product"`
 	Type        string    `bson:"type" json:"type,omitempty"`
 	Quantity    int16     `bson:"quantity" json:"quantity"`
 	Amount      float64   `bson:"amount" json:"amount,omitempty"`
