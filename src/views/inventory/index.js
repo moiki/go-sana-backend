@@ -8,13 +8,18 @@ import LaboratoriesPanel from "./LaboratoriesPanel";
 
 const TabsViews = [
     {
-        label: `Productos`,
+        label: `Catálogo de Productos`,
         key: "1",
         children: <ProductsPanel/>,
     },
     {
-        label: "Incomming",
+        label: "Inventario",
         key: "2",
+        children: <><h1>INENTARIO</h1></>
+    },
+    {
+        label: 'Fuentes y Proveedores',
+        key: '3',
         children: <LaboratoriesPanel/>
     }
 ]

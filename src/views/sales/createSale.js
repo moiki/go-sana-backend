@@ -5,7 +5,7 @@ import {
     Input, InputNumber,
     Modal,
     Popconfirm,
-    Row,
+    Row, Select,
     Space,
     Table,
     Tooltip
@@ -22,6 +22,7 @@ import {SearchInput} from "./MiniSearchProduct";
 import Card from "antd/lib/card/Card";
 import {debounce} from "lodash";
 import ConfirmSale from "./confirmSale";
+import {PRICE_TYPE} from "../inventory/addPrice";
 
 const {useSaleCreation, getProductByCode} = saleServices;
 
@@ -42,13 +43,41 @@ export default function CreateSale() {
         changeBodyValueByObject,
         discount,
         setDiscount
-    } = useSaleCreation()
+    } = useSaleCreation();
+
+    const handlePriceTypeOnList = (priceTypeId, key) => {
+        const product = saleDetails.find(item => item.key === key) || [];
+        if (!product) return;
+        const price = product.prices.find(item => item.id_price === priceTypeId);
+        const newItem = {
+            ...product,
+            price: price?.amount || 0,
+            type: price
+        }
+        handleSaveItem(newItem)
+    }
 
     const columns = [
         {
             title: "Producto",
             dataIndex: "product",
             key: "product",
+        },
+        {
+            title: "Tipo de Precio",
+            dataIndex: "type",
+            key: "prices",
+            render: (text, data) => {
+                return ( <Space wrap>
+                    <Select
+                        style={{ width: 120 }}
+                        onChange={(value) => handlePriceTypeOnList(value, data.key)}
+                        value={text.id_price}
+                    >
+                        {data.prices.map(item => (<Select.Option value={item.id_price}>{item.description}</Select.Option>))}
+                    </Select>
+                </Space>)
+            },
         },
         {
             title: "Precio Unitario",
@@ -126,12 +155,15 @@ export default function CreateSale() {
         if (!utilsServices.hasProperties(product)) {
             openNotificationWithIcon("error", "Item no valido", "Verifique el producto")
         } else {
+            const defaultPrice = product.prices.find(item => item.type === PRICE_TYPE.UNIT)
             const newItem = {
                 key: product?.product_code,
                 product: product.name,
                 cantidad: 1,
-                subTotal: product.price,
-                price: product.price
+                subTotal:defaultPrice?.amount || 0,
+                price: defaultPrice?.amount || 0,
+                prices: product?.prices || [],
+                type: defaultPrice
             }
             handleAddItem(newItem)
             setProductForAdd(null)

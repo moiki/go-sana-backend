@@ -61,7 +61,7 @@ function useSaleCreation() {
         const newData = [...saleDetails];
         const index = newData.findIndex((item) => row.key === item.key);
         const item = newData[index];
-        const updated = {...item, ...row, subTotal: row['cantidad'] * newData[index]['price']}
+        const updated = {...item, ...row, subTotal: row['cantidad'] * row['price']}
         newData.splice(index, 1, updated);
         setSaleDetails(newData);
     };

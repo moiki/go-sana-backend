@@ -38,16 +38,16 @@ const columns = [
             </b>
         ),
     },
-    {
-        title: "Stock",
-        key: "quantity",
-        dataIndex: "quantity",
-        render: (text) => (
-            <b className={"success"}>
-                {`${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            </b>
-        ),
-    },
+    // {
+    //     title: "Stock",
+    //     key: "quantity",
+    //     dataIndex: "quantity",
+    //     render: (text) => (
+    //         <b className={"success"}>
+    //             {`${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+    //         </b>
+    //     ),
+    // },
 ];
 export default function ProductsPanel() {
     const [tableParams, setTableParams] = useState({

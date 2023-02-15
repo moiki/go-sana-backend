@@ -59,6 +59,7 @@ export default function CreateProduct() {
                 "Listo!",
                 "Producto Creado Exitosamente."
             );
+            setPricesState([]);
         },
         onError: (err) => {
             form.resetFields();
