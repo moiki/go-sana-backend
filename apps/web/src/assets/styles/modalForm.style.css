@@ -1,0 +1,7 @@
+.full-modal {
+    height: 100vh !important;
+    width: 100vw !important;
+    margin: 0;
+    top: 0;
+    max-width: calc(100vw);
+}
