@@ -1,6 +1,7 @@
 # AGENTS.md — Sana Backend
 
-Backend for a drugstore point-of-sale ("Sana"). Go 1.18, Fiber v2, MongoDB, JWT auth.
+Backend for a drugstore point-of-sale ("Sana"). Go 1.23, Fiber v2 (v2.52.x),
+MongoDB, JWT auth.
 
 ## Commands
 

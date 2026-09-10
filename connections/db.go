@@ -66,7 +66,6 @@ func DefaultUser() {
 	count, err := coll.CountDocuments(DbCtx, bson.M{"email": utils.EnvData.DefaultUser})
 	if err != nil {
 		panic(err.Error())
-		return
 	}
 	if count == 0 {
 		user := models.NewUser(true)

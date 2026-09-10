@@ -130,9 +130,6 @@ func ListProductPipeline(perPage int16, page int16, filter string) []bson.D {
 			},
 		},
 	}
-	if filter != "" {
-		pipe = append(pipe)
-	}
 	result := utils.ParsePipeline(pipe)
 
 	return result
