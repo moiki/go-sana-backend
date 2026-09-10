@@ -24,18 +24,16 @@ var UserIndex = []mongo.IndexModel{
 	},
 }
 
-var opts = options.CreateIndexes().SetMaxTime(10 * time.Second)
-
 type User struct {
 	UserId       string    `json:"user_id,omitempty" bson:"user_id"`
-	FirstName    string    `bson:"first_name" json:"first_name" validate:"required,email"`
+	FirstName    string    `bson:"first_name" json:"first_name" validate:"required"`
 	LastName     string    `json:"last_name" bson:"last_name"`
-	Email        string    `json:"email" bson:"email"`
-	Password     []byte    `json:"password" bson:"password"`
-	isActive     bool      `json:"is_active" bson:"is_active, default:true"`
+	Email        string    `json:"email" bson:"email" validate:"required,email"`
+	Password     []byte    `json:"-" bson:"password"`
+	IsActive     bool      `json:"is_active" bson:"is_active"`
 	UserType     string    `json:"user_type" bson:"user_type"`
-	RefreshToken string    `json:"refresh_token" bson:"refresh_token"`
-	CreatedAt    time.Time `bson:"created_at,default"`
+	RefreshToken string    `json:"-" bson:"refresh_token"`
+	CreatedAt    time.Time `bson:"created_at"`
 	UpdatedAt    time.Time `bson:"updated_at"`
 }
 
@@ -51,7 +49,7 @@ func NewUser(isDefault bool) User {
 	if isDefault {
 		user.Email = utils.EnvData.DefaultUser
 		user.FirstName = "Administrator"
-		user.isActive = true
+		user.IsActive = true
 		user.UserType = "admin"
 		user.HashPassword(utils.EnvData.DefaultPassword)
 	}

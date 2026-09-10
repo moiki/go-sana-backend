@@ -12,9 +12,9 @@ import (
 func JWTProtected() func(*fiber.Ctx) error {
 	// Create config for JWT authentication middleware.
 	config := jwtMiddleware.Config{
-		SuccessHandler: jwtSuccess,
-		ErrorHandler:   jwtError,
-		SigningKey:     []byte(utils.EnvData.SkKey),
+		SigningMethod: "HS256",
+		SigningKey:    []byte(utils.EnvData.SkKey),
+		ErrorHandler:  jwtError,
 	}
 
 	return jwtMiddleware.New(config)
@@ -35,10 +35,4 @@ func jwtError(c *fiber.Ctx, err error) error {
 		"error": true,
 		"msg":   err.Error(),
 	})
-}
-
-func jwtSuccess(c *fiber.Ctx) error {
-	c.Locals("token", c.GetRespHeader("Authorization"))
-	c.Next()
-	return nil
 }

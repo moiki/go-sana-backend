@@ -55,22 +55,22 @@ func ValidateToken(signedToken string) (err error) {
 		signedToken,
 		&jwt.MapClaims{},
 		func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, errors.New("unexpected signing method")
+			}
 			return []byte(EnvData.SkKey), nil
 		},
 	)
 	if err != nil {
-		return nil
+		return err
 	}
 	_, ok := token.Claims.(*jwt.MapClaims)
 	if !ok {
-		err = errors.New("couldn't parse claims")
-		return err
+		return errors.New("couldn't parse claims")
 	}
-
-	//if claims["exp"] < time.Now().Local().Unix() {
-	//	err = errors.New("token expired")
-	//	return err
-	//}
+	if !token.Valid {
+		return errors.New("invalid token")
+	}
 	return nil
 }
 
@@ -79,20 +79,42 @@ func ValidateRefreshToken(signedToken string) (err error) {
 		signedToken,
 		&RefreshDetails{},
 		func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, errors.New("unexpected signing method")
+			}
 			return []byte(EnvData.SkRefreshKey), nil
 		},
 	)
 	if err != nil {
-		return nil
+		return err
 	}
 	claims, ok := token.Claims.(*RefreshDetails)
 	if !ok {
-		err = errors.New("couldn't parse claims")
-		return err
+		return errors.New("couldn't parse claims")
 	}
-	if claims.ExpiresAt.Unix() < time.Now().Local().Unix() {
-		err = errors.New("refresh token expired")
-		return err
+	if !token.Valid || claims.ExpiresAt.Unix() < time.Now().Local().Unix() {
+		return errors.New("refresh token expired")
 	}
 	return nil
+}
+
+func ExtractEmailFromRefreshToken(signedToken string) (string, error) {
+	token, err := jwt.ParseWithClaims(
+		signedToken,
+		&RefreshDetails{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(EnvData.SkRefreshKey), nil
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+	claims, ok := token.Claims.(*RefreshDetails)
+	if !ok {
+		return "", errors.New("couldn't parse claims")
+	}
+	if claims.Email == "" {
+		return "", errors.New("refresh token missing email")
+	}
+	return claims.Email, nil
 }

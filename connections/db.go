@@ -11,8 +11,9 @@ import (
 	"log"
 )
 
-var collection *mongo.Collection
 var DbCtx = context.TODO()
+
+var mongoClient *mongo.Client
 
 type IndexOptions struct {
 	HasIndex bool
@@ -34,10 +35,22 @@ func EnsureIndex(cd *mongo.Collection, indexes []mongo.IndexModel) error {
 	return nil
 }
 
-func GetCollection(name string, indexOptions IndexOptions) *mongo.Collection {
-
+// Connect lazily creates a single MongoDB client shared by every collection.
+func Connect() (*mongo.Client, error) {
+	if mongoClient != nil {
+		return mongoClient, nil
+	}
 	clientOpts := options.Client().ApplyURI(utils.EnvData.MongoUri)
 	client, err := mongo.Connect(DbCtx, clientOpts)
+	if err != nil {
+		return nil, err
+	}
+	mongoClient = client
+	return mongoClient, nil
+}
+
+func GetCollection(name string, indexOptions IndexOptions) *mongo.Collection {
+	client, err := Connect()
 	if err != nil {
 		log.Fatal(err)
 	}

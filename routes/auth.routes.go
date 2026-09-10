@@ -1,61 +1,64 @@
 package routes
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"go-sana-blackend/middlewares"
 	"go-sana-blackend/services"
-	"go-sana-blackend/utils"
 )
 
 func Login(ctx *fiber.Ctx) error {
 	var credentials services.Credentials
 	if err := ctx.BodyParser(&credentials); err != nil {
-		ctx.Status(400).JSON(&fiber.Map{
+		return ctx.Status(400).JSON(&fiber.Map{
 			"error": err.Error(),
 		})
-		return nil
 	}
 
-	token, _error := services.Login(credentials)
+	token, refreshToken, _error := services.Login(credentials)
 	if _error != nil {
-		ctx.Status(400).JSON(&fiber.Map{
+		return ctx.Status(400).JSON(&fiber.Map{
 			"error": _error.Error(),
 		})
-		return nil
 	}
 	return ctx.JSON(&fiber.Map{
-		"token": fmt.Sprintf("%s", token),
+		"token":         token,
+		"refresh_token": refreshToken,
 	})
 }
 
 func RefreshToken(ctx *fiber.Ctx) error {
-
 	value := map[string]string{}
-	ctx.BodyParser(&value)
-
-	err := utils.ValidateToken(value["token"])
-	if err != nil {
-		fmt.Println(err.Error())
-		return ctx.SendStatus(400)
+	if err := ctx.BodyParser(&value); err != nil {
+		return ctx.Status(400).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
 	}
-	ctx.JSON(&fiber.Map{"token": value["token"]})
-	return nil
+
+	tokens, err := services.RefreshToken(value["token"])
+	if err != nil {
+		return ctx.Status(401).JSON(&fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return ctx.JSON(tokens)
 }
 
 func Me(ctx *fiber.Ctx) error {
 	_user := ctx.Locals("user").(*jwt.Token)
-	claims := _user.Claims.(jwt.MapClaims)
-	//ctx.Context().
-	user, err := services.Me(claims["email"].(string))
-	if err != nil {
-		fmt.Println(err.Error())
-		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
-		return nil
+	claims, ok := _user.Claims.(jwt.MapClaims)
+	if !ok {
+		return ctx.Status(400).JSON(fiber.Map{"message": "invalid token claims"})
 	}
-	ctx.JSON(user)
-	return nil
+	email, ok := claims["email"].(string)
+	if !ok {
+		return ctx.Status(400).JSON(fiber.Map{"message": "invalid token claims"})
+	}
+	user, err := services.Me(email)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+	}
+	return ctx.JSON(user)
 }
 
 func AuthRoutes(app fiber.Router) {
