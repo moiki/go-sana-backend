@@ -10,6 +10,7 @@ import Login from "./layout/auth/Login.auth.js";
 import Signup from "./components/forms/signup/signup";
 import AppLayout, {LoadContent} from "./layout/app/app.layout";
 import reducer from "./store/reducer.store.js";
+import ErrorBoundary from "./components/errors/ErrorBoundary";
 
 function init(state) {
   return state
@@ -19,6 +20,7 @@ function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
+      <ErrorBoundary>
       <GlobalContext.Provider value={{
         state: state,
         dispatch: dispatch,
@@ -39,6 +41,7 @@ function App() {
           </Routes>
         </BrowserRouter>
       </GlobalContext.Provider>
+      </ErrorBoundary>
 
   )
 }

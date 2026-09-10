@@ -1,16 +1,11 @@
-import React, {Component} from "react";
+import React from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {
-    Layout, Menu, Button, Row, Col, Typography, Form, Input, Switch,
+    Layout, Button, Row, Col, Typography, Form, Input, Checkbox,
 } from "antd";
 import signinbg from "../../assets/login-image.jpg";
-import {useForm} from "react-hook-form";
-import {useFreeApi} from "../../services/auth/rest.js";
+import {useFreeApi, setAccessToken} from "../../services/auth/rest.js";
 import {PulseLoader} from "react-spinners";
-
-function onChange(checked) {
-    console.log(`switch to ${checked}`);
-}
 
 const {Title} = Typography;
 const {Footer, Content} = Layout;
@@ -22,7 +17,7 @@ export default function SignIn() {
         "POST",
         {
             onSuccess: ({data}) => {
-                localStorage.setItem("token", data.token);
+                setAccessToken(data.token);
                 navigate("/admin")
             },
         }
@@ -30,7 +25,8 @@ export default function SignIn() {
     const onSubmit = async (data) => {
         await executeService({
             email: data.email,
-            password: data.password
+            password: data.password,
+            remember_me: data.remember_me || false,
         })
     };
 
@@ -46,11 +42,11 @@ export default function SignIn() {
                         lg={{span: 6, offset: 2}}
                         md={{span: 12}}
                     >
-                        <Title className="mb-15">Iniciar Sesión</Title>
+                        <Title className="mb-15">Iniciar Sesion</Title>
                         {error && <b className={"text-danger"}>
                             "Hubo un error al iniciar sesion."</b>}
                         <Title className="font-regular text-muted" level={5}>
-                            Ingrese su correo y constraseña para iniciar sesión
+                            Ingrese su correo y constrasena para iniciar sesion
                         </Title>
                         <Form
                             onFinish={onSubmit}
@@ -69,13 +65,16 @@ export default function SignIn() {
                                 <Input placeholder="Email"/>
                             </Form.Item>
                             <Form.Item
-                                label="Contraseña"
+                                label="Contrasena"
                                 name="password"
                                 rules={[{
                                     required: true, message: "Please input your password!",
                                 },]}
                             >
                                 <Input.Password placeholder="Password"/>
+                            </Form.Item>
+                            <Form.Item name="remember_me" valuePropName="checked">
+                                <Checkbox>Recordarme</Checkbox>
                             </Form.Item>
                             <Form.Item>
                                 <Button
@@ -113,7 +112,7 @@ export default function SignIn() {
 
                 <p className="copyright">
                     {" "}
-                    Copyright © 2022 Sana System by <a href="#pablo">Moises & Linda</a>.{" "}
+                    Copyright (c) 2022 Sana System by <a href="#pablo">Moises & Linda</a>.{" "}
                 </p>
             </Footer>
         </Layout>

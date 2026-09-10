@@ -3,72 +3,106 @@ import config from "../constants/config.js"
 import {useContext, useEffect, useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import GlobalContext, {useAuth} from "../../store/context.store.js";
-import {logout} from "./login.js";
 import actionsStore from "../../store/actions.store.js";
-
-const clt = axios.CancelToken;
-const source = clt.source();
 
 export const REST_URI =
     config.node_env === 'production'
         ? config.rest_uri_prod
         : config.rest_uri_dev
 
-export const instanceAxios = axios.create({
-    baseURL: REST_URI,
-    responseType: 'json',
-    cancelToken: source.token,
-});
+// --- In-memory access token ---
 
-export const CancelRequest = () => {
-    source.cancel('Service Request Aborted');
+let accessToken = null;
+
+export const setAccessToken = (token) => {
+    accessToken = token;
 };
 
-export const verifyTokenLogin = async () => {
-    const TOKEN = localStorage.getItem('token');
-    // alert(JSON.stringify(TOKEN))
-    return await axios
-        .post(
-            config.rest_uri_dev + '/refreshToken',
-            {token: TOKEN},
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + TOKEN,
-                },
+export const getAccessToken = () => accessToken;
+
+// --- Axios client with credentials for cookie support ---
+
+const api = axios.create({
+    baseURL: REST_URI,
+    withCredentials: true,
+});
+
+// --- Token refresh (singleflight) ---
+
+let refreshing = null;
+
+async function refreshAccessToken() {
+    if (!refreshing) {
+        refreshing = api
+            .post("/refreshToken")
+            .then((res) => res.data.token)
+            .finally(() => (refreshing = null));
+    }
+    return refreshing;
+}
+
+// --- Interceptors ---
+
+api.interceptors.request.use((config) => {
+    const token = getAccessToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+api.interceptors.response.use(
+    (res) => res,
+    async (error) => {
+        const original = error.config;
+        if (error.response?.status === 401 && !original._retried) {
+            original._retried = true;
+            try {
+                const token = await refreshAccessToken();
+                setAccessToken(token);
+                original.headers.Authorization = `Bearer ${token}`;
+                return api(original);
+            } catch {
+                setAccessToken(null);
+                window.location.href = "/login";
+                return Promise.reject(error);
             }
-        )
-        .then(
-            response => {
-                localStorage.setItem('token', response.data.token);
-                //Cambiar la fecha de la ultima actualizacion del token
-                const dateToString = new Date()?.toString();
-                localStorage.setItem('latestTokenUpdate', dateToString);
-                return true;
-            },
-            err => {
-                localStorage.clear();
-                return false;
-            }
-        )
-        .catch(error => {
-            localStorage.clear();
-            console.error('Verify Token Error in Catch');
-            return false;
-        });
+        }
+        return Promise.reject(error);
+    }
+);
+
+// --- Login / Logout API calls ---
+
+export const loginRequest = async (email, password, rememberMe = false) => {
+    const res = await api.post("/login", {
+        email,
+        password,
+        remember_me: rememberMe,
+    });
+    setAccessToken(res.data.token);
+    return res.data.token;
+};
+
+export const logoutRequest = async () => {
+    try {
+        await api.post("/logout");
+    } finally {
+        setAccessToken(null);
+    }
 };
 
 /**
- * <function description>
- * customAxios Hook for authorized endpoints
- * @moisesRadix
+ * customAxios Hook for authorized endpoints.
+ * Attaches the in-memory access token to each request.
+ * The 401 interceptor handles refresh + retry automatically.
  * @param {object} configBody Configuration object to call endpoint.
- * @param {boolean} configBody.tokenAlready In case of multiple calls, set this to avoid a refreshToken verification.
- * @param {string} configBody.url  enpoint url for request.
- * @param {string} configBody.method "GET"|POST"|"PUT"|"DELETE"
- * @param {boolean} configBody.automatic Execute the hook automatically in case of true.
- * @param {function} configBody.onSuccess function callback on a successfull response
- * @param {function} configBody.onError function callback on a failed response
+ * @param {boolean} configBody.tokenAlready Skip refresh check (already verified).
+ * @param {string} configBody.url endpoint url for request.
+ * @param {string} configBody.method "GET"|"POST"|"PUT"|"DELETE"
+ * @param {boolean} configBody.automatic Execute the hook automatically if true.
+ * @param {function} configBody.onSuccess callback on a successful response
+ * @param {function} configBody.onError callback on a failed response
  */
 export const useAuthorizedApi = ({
      tokenAlready = false,
@@ -79,7 +113,7 @@ export const useAuthorizedApi = ({
      onSuccess = null,
      onError = null,
  }) => {
-    const { state, dispatch } = useAuth()
+    const { dispatch } = useAuth()
     const hist = useNavigate();
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -88,54 +122,22 @@ export const useAuthorizedApi = ({
     const executeService = async (body = {}) => {
         try {
             setLoading(true);
-            const TOKEN = localStorage.getItem('token');
-            if (tokenAlready) {
-                const response = await instanceAxios({
-                    method: method,
-                    url: url,
-                    data: body,
-                    params: method === 'get' ? body : null,
-                    headers: {
-                        'Content-Type': contentType,
-                        Authorization: 'Bearer ' + TOKEN,
-                    },
-                });
-
-                setLoading(false);
-                setError(null);
-                setData(response.data);
-                if (onSuccess) {
-                    onSuccess(response);
-                }
-            } else {
-                const tkn = await verifyTokenLogin();
-                if (tkn) {
-                    const response = await instanceAxios({
-                        method: method,
-                        url: url,
-                        data: body,
-                        headers: {
-                            'Content-Type': contentType,
-                            Authorization: 'Bearer ' + TOKEN,
-                        },
-                    });
-                    setLoading(false);
-                    setError(null);
-                    setData(response.data);
-                    if (onSuccess) {
-                        onSuccess(response);
-                    }
-                } else {
-                    // CancelRequest();
-                    setLoading(false);
-                    dispatch({ type: actionsStore.SET_INITIAL_STATE });
-                    logout(hist);
-                }
+            const response = await api({
+                method: method,
+                url: url,
+                data: body,
+                params: method === 'get' ? body : null,
+                headers: {
+                    'Content-Type': contentType,
+                },
+            });
+            setLoading(false);
+            setError(null);
+            setData(response.data);
+            if (onSuccess) {
+                onSuccess(response);
             }
-            // const  response = await
         } catch (error) {
-            // console.log('Authorized Api Error:', error);
-
             setLoading(false);
             setData(null);
             setError({
@@ -168,13 +170,10 @@ export const useAuthorizedApi = ({
 }
 
 /**
- * <function description>
- * customAxios Hook for non-authorized (free) endpoints.
- * @moisesRadix
- * @param {string} url  enpoint url for request.
- * @param {string} method "GET"|POST"|"PUT"|"DELETE"
- * @param {function} options.onSuccess function callback on a successfull response
- * @param {function} options.onError function callback on a failed response
+ * customAxios Hook for non-authorized (free) endpoints (e.g. login).
+ * @param {string} url endpoint url for request.
+ * @param {string} method "GET"|"POST"|"PUT"|"DELETE"
+ * @param {object} options { onSuccess, onError, headers }
  */
 export const useFreeApi = (
     url,
@@ -184,17 +183,17 @@ export const useFreeApi = (
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState(null);
-    const { state } = useContext(GlobalContext);
 
     const executeService = async (body = {}) => {
         try {
             setLoading(true);
-            const response = await instanceAxios({
+            const response = await api({
                 method: method,
                 url: url,
                 data: body,
                 headers: {
                     'Content-Type': 'application/json',
+                    ...options.headers,
                 },
             });
             setData(response.data);
@@ -224,15 +223,13 @@ export const useFreeApi = (
     return { data, loading, error, executeService };
 };
 
-// no Hook Axios Method
 /**
- * <function description>
- * @moisesRadix
- * Normal axios endpoint fetch function (async)
- * @param {string} url enpoint url for request
- * @param {object} bodyData body object in case of a non-get method
- * @param {string} method "GET"|POST"|"PUT"|"DELETE"
- * @param {string} contentType [Optional] Content type
+ * Standalone async function for authorized calls.
+ * Uses the api instance (with interceptors) so 401s auto-refresh.
+ * @param {string} url endpoint url
+ * @param {object} bodyData request body
+ * @param {string} method "GET"|"POST"|"PUT"|"DELETE"
+ * @param {string} contentType optional content type
  */
 export const CustomAxios = async (
     url = '',
@@ -241,27 +238,15 @@ export const CustomAxios = async (
     contentType = 'application/json'
 ) => {
     try {
-        const isLogin = await verifyTokenLogin();
-        if (isLogin) {
-            const TOKEN = localStorage.getItem('token');
-            return await instanceAxios({
-                method: method,
-                url: url,
-                data: bodyData,
-                headers: {
-                    'Content-Type': contentType.toString(),
-                    Authorization: 'Bearer ' + TOKEN,
-                },
-            });
-        } else {
-            return {
-                error: {
-                    message: 'Token Expired',
-                },
-            };
-        }
+        return await api({
+            method: method,
+            url: url,
+            data: bodyData,
+            headers: {
+                'Content-Type': contentType.toString(),
+            },
+        });
     } catch (error) {
-        // console.log('CustomAxios Error:', error);
         return {
             error: {
                 message: error.message,
@@ -280,13 +265,10 @@ export const CustomAxios = async (
 };
 
 /**
- * <function description>
- * @moisesRadix
- * Alternative axios endpoint fetch function
- * @param {string} url endpoint url for request
- * @param {object} bodyData body object in case of a non-get method
- * @param {string} method "GET"|POST"|"PUT"|"DELETE"
- * @returns {Promise<void>} Promise
+ * Promise-based wrapper around CustomAxios.
+ * @param {string} url endpoint url
+ * @param {object} bodyData request body
+ * @param {string} method "GET"|"POST"|"PUT"|"DELETE"
  */
 export const CustomAxiosPromise = (
     url = '',
@@ -295,28 +277,15 @@ export const CustomAxiosPromise = (
 ) => {
     return new Promise(async (res, rej) => {
         try {
-            const isLogin = await verifyTokenLogin();
-
-            if (isLogin) {
-                const TOKEN = localStorage.getItem('token');
-
-                const response = await instanceAxios({
-                    method: method,
-                    url: url,
-                    data: bodyData,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: 'Bearer ' + TOKEN,
-                    },
-                });
-                res(response);
-            } else {
-                rej({
-                    error: {
-                        message: 'Token Expired',
-                    },
-                });
-            }
+            const response = await api({
+                method: method,
+                url: url,
+                data: bodyData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            res(response);
         } catch (error) {
             rej({ message: error });
         }

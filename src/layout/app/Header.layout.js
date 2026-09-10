@@ -264,7 +264,7 @@ function Header({
     const [visible, setVisible] = useState(false);
     const [sidenavType, setSidenavType] = useState("transparent");
 
-    useEffect(() => window.scrollTo(0, 0));
+    useEffect(() => window.scrollTo(0, 0), []);
 
     const showDrawer = () => setVisible(true);
     const hideDrawer = () => setVisible(false);
@@ -333,7 +333,7 @@ function Header({
                                 </Title>
                             </div>
                             <Row gutter={[16,16]}>
-                                <Button danger={true} type={"primary"} block onClick={()=>logout(hist)}>Cerrar Sesion</Button>
+                                <Button danger={true} type={"primary"} block onClick={()=>{logout(hist).catch(()=>{})}}>Cerrar Sesion</Button>
                             </Row>
                         </div>
                     </Drawer>
