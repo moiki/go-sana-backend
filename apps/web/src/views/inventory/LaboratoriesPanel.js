@@ -1,4 +1,4 @@
-import moment from "moment";
+import dayjs from "dayjs";
 import {Button, Card, Col, Input, Pagination, Row, Table} from "antd";
 import {PlusCircleOutlined, SearchOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
@@ -22,7 +22,7 @@ const columnsLab = [
         title: "Fecha Ingreso",
         dataIndex: "created_at",
         key: "created_at",
-        render: (text) => <b>{ moment(text).format("ddd DD MMM YYYY hh:mm a") }</b>
+        render: (text) => <b>{ dayjs(text).format("ddd DD MMM YYYY hh:mm a") }</b>
     },
 ];
 
@@ -41,7 +41,7 @@ const columnsProv = [
         title: "Fecha Ingreso",
         dataIndex: "created_at",
         key: "created_at",
-        render: (text) => <b>{ moment(text).format("ddd DD MMM YYYY hh:mm a") }</b>
+        render: (text) => <b>{ dayjs(text).format("ddd DD MMM YYYY hh:mm a") }</b>
     },
 ];
 

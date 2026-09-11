@@ -67,17 +67,21 @@ export default function CreateSale() {
             title: "Tipo de Precio",
             dataIndex: "type",
             key: "prices",
-            render: (text, data) => {
-                return ( <Space wrap>
-                    <Select
-                        style={{ width: 120 }}
-                        onChange={(value) => handlePriceTypeOnList(value, data.key)}
-                        value={text.id_price}
-                    >
-                        {data.prices.map(item => (<Select.Option value={item.id_price}>{item.description}</Select.Option>))}
-                    </Select>
-                </Space>)
-            },
+render: (text, data) => {
+                                return (
+                                    <Space wrap>
+                                        <Select
+                                            style={{width: 120}}
+                                            onChange={(value) => handlePriceTypeOnList(value, data.key)}
+                                            value={text.id_price}
+                                            options={data.prices.map(item => ({
+                                                value: item.id_price,
+                                                label: item.description,
+                                            }))}
+                                        />
+                                    </Space>
+                                )
+                            },
         },
         {
             title: "Precio Unitario",
@@ -239,27 +243,28 @@ export default function CreateSale() {
                 </Row>
                 <Row>
                     <Col span={24}>
-                        <Input.Group>
-                            <Checkbox checked={hasDiscount} onChange={() => setHasDiscount(!hasDiscount)}>Agregar
-                                Descuento</Checkbox>
-                            <Select
-                                style={{width: 110, marginLeft: 8}}
-                                value={saleBody.DiscountType}
-                                onChange={(value) => changeBodyValue(value, "DiscountType")}
-                                disabled={!hasDiscount}
-                            >
-                                <Select.Option value={DISCOUNT_TYPE.PERCENT_DISCOUNT}>Porcentaje (%)</Select.Option>
-                                <Select.Option value={DISCOUNT_TYPE.AMOUNT_DISCOUNT}>Monto (C$)</Select.Option>
-                            </Select>
-                            <InputNumber
-                                value={saleBody.Discount}
-                                onChange={(value) => changeBodyValue(value, "Discount")}
-                                min={0}
-                                max={saleBody.DiscountType === DISCOUNT_TYPE.PERCENT_DISCOUNT ? 100 : undefined}
-                                disabled={!hasDiscount}
-                                addonAfter={saleBody.DiscountType === DISCOUNT_TYPE.PERCENT_DISCOUNT ? "%" : "C$"}
-                            />
-                        </Input.Group>
+                        <Space.Compact style={{marginTop: 8}}>
+                                    <Checkbox style={{marginRight: 8}} checked={hasDiscount}
+                                              onChange={() => setHasDiscount(!hasDiscount)}>Agregar Descuento</Checkbox>
+                                    <Select
+                                        style={{width: 140}}
+                                        value={saleBody.DiscountType}
+                                        onChange={(value) => changeBodyValue(value, "DiscountType")}
+                                        disabled={!hasDiscount}
+                                        options={[
+                                            {value: DISCOUNT_TYPE.PERCENT_DISCOUNT, label: "Porcentaje (%)"},
+                                            {value: DISCOUNT_TYPE.AMOUNT_DISCOUNT, label: "Monto (C$)"},
+                                        ]}
+                                    />
+                                    <InputNumber
+                                        value={saleBody.Discount}
+                                        onChange={(value) => changeBodyValue(value, "Discount")}
+                                        min={0}
+                                        max={saleBody.DiscountType === DISCOUNT_TYPE.PERCENT_DISCOUNT ? 100 : undefined}
+                                        disabled={!hasDiscount}
+                                        addonAfter={saleBody.DiscountType === DISCOUNT_TYPE.PERCENT_DISCOUNT ? "%" : "C$"}
+                                    />
+                                </Space.Compact>
                     </Col>
                 </Row>
 

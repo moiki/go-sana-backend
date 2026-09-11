@@ -315,7 +315,7 @@ function Header({
                         width={360}
                         onClose={hideDrawer}
                         placement={placement}
-                        visible={visible}
+                        open={visible}
                     >
                         <div layout="vertical">
                             <div className="header-top">
@@ -332,7 +332,7 @@ function Header({
                                 />
                                 <Title level={4}>
                                     {user.first_name}
-                                    <Text className="subtitle">See our dashboard options.</Text>
+                                    <Text className="subtitle">Opciones del panel.</Text>
                                 </Title>
                             </div>
                             <Row gutter={[16,16]}>

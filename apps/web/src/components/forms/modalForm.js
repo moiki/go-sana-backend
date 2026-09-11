@@ -28,7 +28,7 @@ export default function ModalForm({ title, open, closeModal, url, callback, chil
             okText="Guardar"
             cancelText="Cancelar"
             className={full ?"full-modal": ""}
-            bodyStyle={ full? {height: "calc(100vh - 110px)"}: {}}
+            styles={ full? {body: {height: "calc(100vh - 110px)"}}: {}}
             onCancel={closeModal}
             onOk={() => {
                 form

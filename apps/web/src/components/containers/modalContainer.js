@@ -9,7 +9,7 @@ export default function ModalContainer({title, open, closeModal, callback, child
         cancelText={"Cancelar"}
         okButtonProps={{name: "Cerrar"}}
         className={full ? "full-modal" : ""}
-        bodyStyle={full ? {height: "calc(100vh - 110px)"} : {}}
+        styles={full ? {body: {height: "calc(100vh - 110px)"}} : {}}
         onCancel={closeModal}
         destroyOnClose={true}
         onOk={() => {

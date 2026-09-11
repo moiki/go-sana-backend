@@ -3305,3 +3305,54 @@ svg
 path {
     fill: #8c8c8c;
 }
+
+/* Login brand */
+.sana-login {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+    background: linear-gradient(135deg, #0F766E 0%, #134E4A 100%);
+}
+
+.sana-login-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.sana-login-title.ant-typography {
+    color: #ffffff;
+    margin: 8px 0 0;
+}
+
+.sana-login-tagline.ant-typography {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.sana-login-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.24);
+}
+
+.sana-login-error {
+    margin-top: 16px;
+    border-radius: 6px;
+}
+
+/* Signup inner (uses auth-layout gradient) */
+.sana-auth-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+}

@@ -1,14 +1,18 @@
 import React, {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
-import {
-    Layout, Button, Row, Col, Typography, Form, Input, Checkbox,
-} from "antd";
-import signinbg from "../../assets/login-image.jpg";
+import {Button, Card, Checkbox, Col, Form, Input, Row, Typography} from "antd";
+import {LockOutlined, MailOutlined} from "@ant-design/icons";
+import logo from "../../assets/sana-logo.svg";
 import {useLoginMutation} from "../../services/query/api";
 import {PulseLoader} from "react-spinners";
 
-const {Title} = Typography;
-const {Footer, Content} = Layout;
+const {Title, Text} = Typography;
+
+const errorMessage = (err) =>
+    err?.response?.data?.error ||
+    err?.response?.data?.message ||
+    err?.message ||
+    "Hubo un error al iniciar sesión. Verifique sus credenciales.";
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -17,12 +21,12 @@ export default function SignIn() {
         onSuccess: () => {
             navigate("/admin");
         },
-        onError: () => {
-            setFormError("Hubo un error al iniciar sesión. Verifique sus credenciales.");
+        onError: (err) => {
+            setFormError(errorMessage(err));
         },
     });
 
-    const onSubmit = async (data) => {
+    const onSubmit = (data) => {
         setFormError(null);
         mutation.mutate({
             email: data.email,
@@ -31,92 +35,67 @@ export default function SignIn() {
         });
     };
 
-    const onFinishFailed = (errorInfo) => {
-        console.log("Failed:", errorInfo);
-    };
-    return (<>
-        <Layout className="layout-default layout-signin" style={{height: "100vh"}}>
-            <Content className="signin">
-                <Row gutter={[24, 0]} justify="space-around">
-                    <Col
-                        xs={{span: 24, offset: 0}}
-                        lg={{span: 6, offset: 2}}
-                        md={{span: 12}}
+    return (
+        <div className="sana-login">
+            <div className="sana-login-brand">
+                <img src={logo} alt="Sana" width={64} height={64}/>
+                <Title level={2} className="sana-login-title">Sana POS</Title>
+                <Text className="sana-login-tagline">Sistema de punto de venta para tu farmacia</Text>
+            </div>
+            <Card className="sana-login-card" bordered={false}>
+                <Title level={3}>Iniciar sesión</Title>
+                <Text type="secondary">Ingrese su correo y contraseña para continuar</Text>
+                {formError && (
+                    <div className="ant-alert ant-alert-error sana-login-error">
+                        {formError}
+                    </div>
+                )}
+                <Form
+                    onFinish={onSubmit}
+                    layout="vertical"
+                    className="row-col"
+                    style={{marginTop: 24}}
+                >
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[{required: true, message: "Por favor ingrese su correo"}]}
                     >
-                        <Title className="mb-15">Iniciar Sesión</Title>
-                        {formError && <b className={"text-danger"}>
-                            {formError}</b>}
-                        <Title className="font-regular text-muted" level={5}>
-                            Ingrese su correo y contraseña para iniciar sesión
-                        </Title>
-                        <Form
-                            onFinish={onSubmit}
-                            onFinishFailed={onFinishFailed}
-                            layout="vertical"
-                            className="row-col"
-                        >
-                            <Form.Item
-                                className="username"
-                                label="Email"
-                                name="email"
-                                rules={[{
-                                    required: true, message: "Por favor ingrese su correo",
-                                },]}
-                            >
-                                <Input placeholder="Email"/>
-                            </Form.Item>
-                            <Form.Item
-                                label="Contraseña"
-                                name="password"
-                                rules={[{
-                                    required: true, message: "Por favor ingrese su contraseña",
-                                },]}
-                            >
-                                <Input.Password placeholder="Contraseña"/>
-                            </Form.Item>
-                            <Form.Item name="remember_me" valuePropName="checked">
-                                <Checkbox>Recordarme</Checkbox>
-                            </Form.Item>
-                            <Form.Item>
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    style={{width: "100%"}}
-                                >
-                                    {
-                                        mutation.isLoading ?
-                                            <PulseLoader color={"white"} loading/>
-                                            : "INICIAR SESIÓN"
-                                    }
-                                </Button>
-                            </Form.Item>
-                            <p className="font-semibold text-muted">
-                                ¿No tiene una cuenta?{" "}
-                                <Link to="/signup" className="text-dark font-bold">
-                                    Registrarse
-                                </Link>
-                            </p>
-                        </Form>
-                    </Col>
-                    <Col
-                        className="sign-img"
-                        style={{padding: 12}}
-                        xs={{span: 24}}
-                        lg={{span: 12}}
-                        md={{span: 12}}
+                        <Input
+                            prefix={<MailOutlined/>}
+                            placeholder="Email"
+                            size="large"
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        label="Contraseña"
+                        name="password"
+                        rules={[{required: true, message: "Por favor ingrese su contraseña"}]}
                     >
-                        <img src={signinbg} alt=""/>
-                    </Col>
-                </Row>
-            </Content>
-            <Footer>
-
-                <p className="copyright">
-                    {" "}
-                    Copyright (c) 2022 Sana System by <a href="#pablo">Moises & Linda</a>.{" "}
-                </p>
-            </Footer>
-        </Layout>
-    </>);
-
+                        <Input.Password
+                            prefix={<LockOutlined/>}
+                            placeholder="Contraseña"
+                            size="large"
+                        />
+                    </Form.Item>
+                    <Form.Item name="remember_me" valuePropName="checked">
+                        <Checkbox>Recordarme</Checkbox>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" block size="large">
+                            {mutation.isLoading ? (
+                                <PulseLoader color={"white"} loading/>
+                            ) : (
+                                "INICIAR SESIÓN"
+                            )}
+                        </Button>
+                    </Form.Item>
+                    <Text type="secondary">
+                        ¿No tiene una cuenta?{" "}
+                        <Link to="/signup" className="text-dark font-bold">Registrarse</Link>
+                    </Text>
+                </Form>
+            </Card>
+        </div>
+    );
 }

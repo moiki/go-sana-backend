@@ -5,6 +5,7 @@ import {createSale} from "../sales/sales.services";
 export const queryKeys = {
     me: ['me'],
     collections: ['collections'],
+    dashboard: ['dashboard'],
     table: (url) => ['table', url],
 };
 
@@ -60,6 +61,13 @@ export function useMeQuery() {
         queryKey: queryKeys.me,
         queryFn: () => request('/me').then(res => res.data),
         retry: false,
+    });
+}
+
+export function useDashboardQuery() {
+    return useQuery({
+        queryKey: queryKeys.dashboard,
+        queryFn: () => request('/sales/dashboard').then(res => res.data?.data),
     });
 }
 

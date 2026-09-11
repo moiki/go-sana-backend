@@ -1,6 +1,7 @@
 .auth-layout {
-    background-image: url("../../assets/auth_layout.png");
-    background-repeat: no-repeat;
-    background-size: cover;
+    background: linear-gradient(135deg, #0F766E 0%, #134E4A 100%);
     height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

@@ -3,7 +3,7 @@ import {useTableQuery} from "../../services/query/api";
 import {Button, Card, Col, Input, Pagination, Table} from "antd";
 import {PlusCircleOutlined, SearchOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
-import moment from "moment/moment.js";
+import dayjs from "dayjs";
 import {PRICE_TYPE} from "./addPrice";
 
 const columns = [
@@ -21,7 +21,7 @@ const columns = [
         title: "Fecha Ingreso",
         dataIndex: "created_at",
         key: "created_at",
-        render: (text) => <b>{ moment(text).format("ddd DD MMM YYYY hh:mm a") }</b>
+        render: (text) => <b>{ dayjs(text).format("ddd DD MMM YYYY hh:mm a") }</b>
     },
     {
         title: "Código De Producto",
@@ -78,7 +78,7 @@ export default function ProductsPanel() {
                                 <Link to={"/admin/inventario/crear"}>
                                     <Button type={"primary"} style={{borderRadius: 0}}>
                                         <PlusCircleOutlined />
-                                        Add Product
+                                        Agregar Producto
                                     </Button>
                                 </Link>
                             </div>

@@ -187,18 +187,12 @@ export default function CreateProduct() {
                                                 setOpenPresentation(true);
                                             }}>Agregue una nueva</Button>
                                         </>}
-                                    >
-                                        {presentations.map((item, index) => {
-                                            return (
-                                                <Select.Option
-                                                    value={item?.product_presentation_id}
-                                                    key={index}
-                                                >
-                                                    {item.name}
-                                                </Select.Option>
-                                            );
-                                        })}
-                                    </Select>
+                                        options={presentations.map((item, index) => ({
+                                            value: item?.product_presentation_id,
+                                            label: item.name,
+                                            key: index,
+                                        }))}
+                                    />
                                 </Form.Item>
                                 <Form.Item
                                     label={"Laboratorio"}
@@ -225,18 +219,12 @@ export default function CreateProduct() {
                                                 }}
                                             >Agregue una nueva</Button>
                                         </>}
-                                    >
-                                        {laboratories.map((item, index) => {
-                                            return (
-                                                <Select.Option
-                                                    value={item?.laboratory_id}
-                                                    key={index}
-                                                >
-                                                    {item.name}
-                                                </Select.Option>
-                                            );
-                                        })}
-                                    </Select>
+                                        options={laboratories.map((item, index) => ({
+                                            value: item?.laboratory_id,
+                                            label: item.name,
+                                            key: index,
+                                        }))}
+                                    />
                                 </Form.Item>
                                 <Form.Item
                                     label={"Proveedor"}
@@ -264,18 +252,12 @@ export default function CreateProduct() {
                                                 Agregue una nueva
                                             </Button>
                                         </>}
-                                    >
-                                        {providers.map((item, index) => {
-                                            return (
-                                                <Select.Option
-                                                    value={item?.provider_id}
-                                                    key={index}
-                                                >
-                                                    {item.name}
-                                                </Select.Option>
-                                            );
-                                        })}
-                                    </Select>
+                                        options={providers.map((item, index) => ({
+                                            value: item?.provider_id,
+                                            label: item.name,
+                                            key: index,
+                                        }))}
+                                    />
                                 </Form.Item>
                             </Card>
                         </Col>
