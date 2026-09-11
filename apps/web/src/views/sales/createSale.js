@@ -3,20 +3,23 @@ import {
     Col,
     Form,
     Input, InputNumber,
-    Modal,
     Popconfirm,
     Row, Select,
     Space,
     Table,
     Tooltip
 } from "antd";
-import {DeleteOutlined, PercentageOutlined, SearchOutlined} from "@ant-design/icons";
-import React, {useEffect, useState} from "react";
+import {DeleteOutlined} from "@ant-design/icons";
+import React, {useState} from "react";
 // import ModalContainer from "../../components/containers/modalContainer";
 import EditableCell, {EditableRow} from "../../components/Editables/EditableCell";
 import utilsServices, {DISCOUNT_TYPE, PARSE_TEXT} from "../../services/utils.services";
 import "../../assets/styles/customTables.styles.css"
-import saleServices from "../../services/sales/sales.services";
+import saleServices, {
+    createSale,
+    computeDiscountedAmount,
+    buildSalePayload
+} from "../../services/sales/sales.services";
 import openNotificationWithIcon from "../../components/alerts/notifications";
 import {SearchInput} from "./MiniSearchProduct";
 import Card from "antd/lib/card/Card";
@@ -36,18 +39,15 @@ export default function CreateSale() {
         saleDetails,
         handleDeleteItem,
         handleSaveItem,
-        totalPayment,
         saleBody,
-        resetBody,
+        resetSale,
         changeBodyValue,
-        changeBodyValueByObject,
-        discount,
-        setDiscount
+        changeBodyValueByObject
     } = useSaleCreation();
 
     const handlePriceTypeOnList = (priceTypeId, key) => {
-        const product = saleDetails.find(item => item.key === key) || [];
-        if (!product) return;
+        const product = saleDetails.find(item => item.key === key);
+        if (!product || !Array.isArray(product.prices)) return;
         const price = product.prices.find(item => item.id_price === priceTypeId);
         const newItem = {
             ...product,
@@ -91,7 +91,7 @@ export default function CreateSale() {
         },
         {
             editable: true,
-            title: <div className={"sn-editable-header"}><b>Candidad</b><small><b>Click para Editar</b></small></div>,
+            title: <div className={"sn-editable-header"}><b>Cantidad</b><small><b>Click para Editar</b></small></div>,
             dataIndex: "cantidad",
             key: "cantidad",
             onCell: (record) => ({
@@ -158,9 +158,10 @@ export default function CreateSale() {
             const defaultPrice = product.prices.find(item => item.type === PRICE_TYPE.UNIT)
             const newItem = {
                 key: product?.product_code,
+                productId: product?.product_id,
                 product: product.name,
                 cantidad: 1,
-                subTotal:defaultPrice?.amount || 0,
+                subTotal: defaultPrice?.amount || 0,
                 price: defaultPrice?.amount || 0,
                 prices: product?.prices || [],
                 type: defaultPrice
@@ -171,12 +172,42 @@ export default function CreateSale() {
         formAddProduct.resetFields();
     }
 
-    return <Card title={"NUEVA VENTA"} extra={<Button type={"primary"} onClick={() => {
+    const grossTotal = saleDetails.reduce((acc, d) => acc + (Number(d.subTotal) || 0), 0);
+    const displayAmount = Math.round(computeDiscountedAmount(grossTotal, saleBody.DiscountType, saleBody.Discount) * 100) / 100;
+    const [submittingSale, setSubmittingSale] = useState(false);
+
+    const handleConfirmSale = async () => {
+        if (saleDetails.length === 0) {
+            openNotificationWithIcon("warning", "Venta vacía", "Agregue al menos un producto");
+            return;
+        }
+        setSubmittingSale(true);
+        try {
+            const payload = buildSalePayload(saleBody, saleDetails);
+            await createSale(payload);
+            openNotificationWithIcon("success", "Venta registrada", "La venta se guardó correctamente");
+            setOpenConfirm(false);
+            resetSale();
+            setHasDiscount(false);
+        } catch (err) {
+            openNotificationWithIcon("error", "Error al guardar la venta", err.message || "Intente de nuevo");
+        } finally {
+            setSubmittingSale(false);
+        }
+    };
+
+    return <Card title={"NUEVA VENTA"} extra={<Button type={"primary"} disabled={saleDetails.length === 0} onClick={() => {
         setOpenConfirm(true);
     }}>Generar Venta</Button>}>
-        <ConfirmSale open={openConfirm} Change={saleBody.Change} Amount={saleBody.Amount}
-                     onChangePaid={changeBodyValueByObject} PaidWith={saleBody.PaidWith}
-                     closeModal={()=> setOpenConfirm(false)}
+        <ConfirmSale
+            open={openConfirm}
+            Change={saleBody.Change}
+            Amount={displayAmount}
+            onChangePaid={changeBodyValueByObject}
+            PaidWith={saleBody.PaidWith}
+            confirmLoading={submittingSale}
+            onConfirm={handleConfirmSale}
+            closeModal={() => setOpenConfirm(false)}
         />
         <Row gutter={[24, 0]}>
             <Col span={24}>
@@ -208,17 +239,27 @@ export default function CreateSale() {
                     </Col>
                 </Row>
                 <Row>
-                    <Col span={24} aria-disabled={hasDiscount}>
+                    <Col span={24}>
                         <Input.Group>
-                            <Checkbox value={hasDiscount} onChange={() => setHasDiscount(!hasDiscount)}>Agregar
+                            <Checkbox checked={hasDiscount} onChange={() => setHasDiscount(!hasDiscount)}>Agregar
                                 Descuento</Checkbox>
+                            <Select
+                                style={{width: 110, marginLeft: 8}}
+                                value={saleBody.DiscountType}
+                                onChange={(value) => changeBodyValue(value, "DiscountType")}
+                                disabled={!hasDiscount}
+                            >
+                                <Select.Option value={DISCOUNT_TYPE.PERCENT_DISCOUNT}>Porcentaje (%)</Select.Option>
+                                <Select.Option value={DISCOUNT_TYPE.AMOUNT_DISCOUNT}>Monto (C$)</Select.Option>
+                            </Select>
                             <InputNumber
                                 value={saleBody.Discount}
-                                onChange={(data => changeBodyValue(data.target.value, "Discount"))}
+                                onChange={(value) => changeBodyValue(value, "Discount")}
                                 min={0}
+                                max={saleBody.DiscountType === DISCOUNT_TYPE.PERCENT_DISCOUNT ? 100 : undefined}
                                 disabled={!hasDiscount}
+                                addonAfter={saleBody.DiscountType === DISCOUNT_TYPE.PERCENT_DISCOUNT ? "%" : "C$"}
                             />
-                            <PercentageOutlined style={{marginLeft: 10}}/>
                         </Input.Group>
                     </Col>
                 </Row>
@@ -231,7 +272,7 @@ export default function CreateSale() {
                         }
                     }}
                     rowClassName={() => 'editable-row'}
-                    footer={() => <b>Total a pagar: {utilsServices.ParseNumber(saleBody.Amount, PARSE_TEXT.MONEY)}</b>}
+                    footer={() => <b>Total a pagar: {utilsServices.ParseNumber(displayAmount, PARSE_TEXT.MONEY)}</b>}
                     columns={columns}
                     dataSource={saleDetails}
                     pagination={false}

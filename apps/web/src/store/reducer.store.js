@@ -13,12 +13,6 @@ export default function reducer (state = initialState, action) {
                 user: action.payload
             }
         }
-        case actionsStore.SET_HISTORY: {
-            return {
-                ...state,
-                history: action.payload
-            }
-        }
         default: {
             return state
         }

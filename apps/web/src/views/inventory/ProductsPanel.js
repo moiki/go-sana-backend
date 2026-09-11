@@ -137,7 +137,13 @@ export default function ProductsPanel() {
                                 }}
                             >
                                 <h6>Total: {tableInventory.total}</h6>{" "}
-                                <Pagination  size="small" total={tableInventory.total} />
+                                <Pagination
+                                    current={tableParams.page}
+                                    pageSize={tableParams.perPage}
+                                    onChange={(page) => setTableParams({...tableParams, page})}
+                                    size="small"
+                                    total={tableInventory.total}
+                                />
                             </div>
                         </div>
                     </Card>

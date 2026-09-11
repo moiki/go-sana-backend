@@ -61,7 +61,7 @@ function useSaleCreation() {
         const newData = [...saleDetails];
         const index = newData.findIndex((item) => row.key === item.key);
         const item = newData[index];
-        const updated = {...item, ...row, subTotal: row['cantidad'] * row['price']}
+        const updated = {...item, ...row, subTotal: Number(row['cantidad'] || 1) * Number(row['price'] || 0)}
         newData.splice(index, 1, updated);
         setSaleDetails(newData);
     };
@@ -80,12 +80,15 @@ function useSaleCreation() {
 
     const resetBody = () => setSaleBody(InitialSaleBody)
 
+    const resetSale = () => {
+        setSaleDetails([]);
+        setSaleBody(InitialSaleBody);
+        setDiscount(0);
+    }
+
     useEffect(() => {
         if (saleDetails.length > 0) {
             const total = sumBy(saleDetails, "subTotal")
-            // setTotalPayment(total);
-            // changeBodyValue(total, "Amount");
-            // changeBodyValue(saleDetails, "Details");
             setSaleBody({...saleBody, Amount: total, Details: saleDetails});
         }
     }, [saleDetails]);
@@ -96,6 +99,7 @@ function useSaleCreation() {
         handleAddItem,
         handleSaveItem,
         handleDeleteItem,
+        resetSale,
         saleDetails,
         totalPayment,
         discount,
@@ -105,6 +109,44 @@ function useSaleCreation() {
         changeBodyValue,
         changeBodyValueByObject
     }
+}
+
+export function computeDiscountedAmount(gross, discountType, discountValue) {
+    const discount = Number(discountValue) || 0;
+    if (discount <= 0) return gross;
+    if (discountType === DISCOUNT_TYPE.PERCENT_DISCOUNT) {
+        const off = Math.min(discount, 100);
+        return gross - (gross * off / 100);
+    }
+    return Math.max(gross - discount, 0);
+}
+
+export function buildSalePayload(saleBody, details) {
+    const gross = details.reduce((acc, d) => acc + (Number(d.subTotal) || 0), 0);
+    const total = computeDiscountedAmount(gross, saleBody.DiscountType, saleBody.Discount);
+    const factor = gross > 0 ? total / gross : 0;
+    return {
+        client_name: saleBody.ClientName,
+        commentary: saleBody.Commentary,
+        paid_with: Number(saleBody.PaidWith) || 0,
+        change: Number(saleBody.Change) || 0,
+        discount_type: saleBody.DiscountType,
+        discount: Number(saleBody.Discount) || 0,
+        details: details.map(d => ({
+            product_id: d.productId,
+            inner_quantity: Number(d.cantidad) || 1,
+            sub_total: Math.round(((Number(d.subTotal) || 0) * factor) * 100) / 100,
+        })),
+    };
+}
+
+export async function createSale(payload) {
+    const res = await CustomAxios("/sales/create", payload, "POST");
+    if (res.error) {
+        const err = new Error(res.error.payload || res.error.message);
+        throw err;
+    }
+    return res;
 }
 
 export default {

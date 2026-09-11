@@ -3,11 +3,14 @@ import {setAccessToken, logoutRequest} from "./rest.js";
 export const DEFAULT_VIEW_ADMIN = '/admin';
 export const DEFAULT_VIEW_LOG = '/login';
 
-export const logout = async (history) => {
+export const logout = async (history, resetState) => {
     try {
         await logoutRequest();
     } catch {
         // Even if the API call fails, clear local state
+    }
+    if (resetState) {
+        resetState();
     }
     history(DEFAULT_VIEW_LOG);
 };

@@ -3,10 +3,11 @@ import {Form, InputNumber} from "antd";
 import React from "react";
 
 
-export default function ConfirmSale({PaidWith, Amount, Change, onChangePaid, open, closeModal}) {
+export default function ConfirmSale({PaidWith, Amount, Change, onChangePaid, onConfirm, confirmLoading, open, closeModal}) {
     return <ModalContainer
         open={open}
         title={<b>Confirmación de venta</b>}
+        callback={onConfirm}
         closeModal={() => {
             closeModal && closeModal();
             onChangePaid({
@@ -18,6 +19,9 @@ export default function ConfirmSale({PaidWith, Amount, Change, onChangePaid, ope
     >
         <div>
             <p style={{fontSize: 18}}>¿Seguro que desea guardar esta venta?</p>
+            <p style={{fontSize: 16, fontWeight: 600}}>
+                Total a cobrar: {`C$ ${Amount}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            </p>
             <Form.Item
                 label="Paga con"
                 name="PaidWith"
@@ -26,9 +30,10 @@ export default function ConfirmSale({PaidWith, Amount, Change, onChangePaid, ope
                     min={0}
                     value={PaidWith}
                     onChange={data => {
+                        const paid = Number(data) || 0;
                         onChangePaid({
-                            Change: Math.abs(Number(data) - Amount),
-                            PaidWith: Number(data)
+                            Change: Math.max(paid - Amount, 0),
+                            PaidWith: paid
                         })
                     }}
                     formatter={(value) =>

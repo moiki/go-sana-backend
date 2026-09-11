@@ -263,31 +263,3 @@ export const CustomAxios = async (
         };
     }
 };
-
-/**
- * Promise-based wrapper around CustomAxios.
- * @param {string} url endpoint url
- * @param {object} bodyData request body
- * @param {string} method "GET"|"POST"|"PUT"|"DELETE"
- */
-export const CustomAxiosPromise = (
-    url = '',
-    bodyData = {},
-    method = 'post',
-) => {
-    return new Promise(async (res, rej) => {
-        try {
-            const response = await api({
-                method: method,
-                url: url,
-                data: bodyData,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            res(response);
-        } catch (error) {
-            rej({ message: error });
-        }
-    });
-};

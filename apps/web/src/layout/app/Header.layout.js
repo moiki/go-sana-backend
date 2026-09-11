@@ -37,6 +37,7 @@ import {
 import {NavLink, Link, useNavigate} from "react-router-dom";
 import styled from "styled-components";
 import {useAuth} from "../../store/context.store.js";
+import actionsStore from "../../store/actions.store.js";
 import {logout} from "../../services/auth/login.js";
 
 const ButtonContainer = styled.div`
@@ -259,7 +260,7 @@ function Header({
                     handleFixedNavbar,
                 }) {
     const {Title, Text} = Typography;
-    const {state: {user}} = useAuth()
+    const {state: {user}, dispatch} = useAuth()
     const hist = useNavigate()
     const [visible, setVisible] = useState(false);
     const [sidenavType, setSidenavType] = useState("transparent");
@@ -333,7 +334,10 @@ function Header({
                                 </Title>
                             </div>
                             <Row gutter={[16,16]}>
-                                <Button danger={true} type={"primary"} block onClick={()=>{logout(hist).catch(()=>{})}}>Cerrar Sesion</Button>
+                                <Button danger={true} type={"primary"} block onClick={() => {
+                                    logout(hist, () => dispatch({type: actionsStore.SET_INITIAL_STATE})).catch(() => {
+                                    })
+                                }}>Cerrar Sesion</Button>
                             </Row>
                         </div>
                     </Drawer>

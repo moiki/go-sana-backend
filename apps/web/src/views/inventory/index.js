@@ -15,7 +15,7 @@ const TabsViews = [
     {
         label: "Inventario",
         key: "2",
-        children: <><h1>INENTARIO</h1></>
+        children: <><h1>Inventario</h1></>
     },
     {
         label: 'Fuentes y Proveedores',

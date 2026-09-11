@@ -1,8 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import GlobalContext, {useAuth} from "../../store/context.store.js";
 import {Navigate, Outlet, Route, Routes, useLocation, useNavigate} from "react-router-dom";
-import Navbar from "../../components/navbar/navbar";
-import Sidenav from "../../components/sidenav/sidenav";
 import {appRoutes} from "../../services/constants/routes.js";
 import {useAuthorizedApi} from "../../services/auth/rest.js";
 import actionsStore from "../../store/actions.store.js";

@@ -1,25 +1,7 @@
-import Login from "../../components/forms/login/login.js";
 import HomeView from "../../views/homeView";
 import CreateProduct from "../../views/inventory/createProduct";
 import MainInventory from "../../views/inventory";
 import MainSales from "../../views/sales";
-
-export const authRoutes = [
-    {
-        path: 'login',
-        name: 'Login',
-        mini: 'L',
-        component: Login,
-        layout: '/auth',
-    },
-    {
-        path: '/forgot-password',
-        name: 'forgotPassword',
-        mini: 'f',
-        component: null,
-        layout: '/auth',
-    },
-]
 
 export const appRoutes = [
     {

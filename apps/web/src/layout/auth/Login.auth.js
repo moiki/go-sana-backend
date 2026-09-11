@@ -42,11 +42,11 @@ export default function SignIn() {
                         lg={{span: 6, offset: 2}}
                         md={{span: 12}}
                     >
-                        <Title className="mb-15">Iniciar Sesion</Title>
+                        <Title className="mb-15">Iniciar Sesión</Title>
                         {error && <b className={"text-danger"}>
-                            "Hubo un error al iniciar sesion."</b>}
+                            Hubo un error al iniciar sesión. Verifique sus credenciales.</b>}
                         <Title className="font-regular text-muted" level={5}>
-                            Ingrese su correo y constrasena para iniciar sesion
+                            Ingrese su correo y contraseña para iniciar sesión
                         </Title>
                         <Form
                             onFinish={onSubmit}
@@ -85,14 +85,14 @@ export default function SignIn() {
                                     {
                                         loading === true ?
                                             <PulseLoader color={"white"} loading/>
-                                            : "INICIAR SESION"
+                                            : "INICIAR SESIÓN"
                                     }
                                 </Button>
                             </Form.Item>
                             <p className="font-semibold text-muted">
-                                Don't have an account?{" "}
-                                <Link to="/sign-up" className="text-dark font-bold">
-                                    Sign Up
+                                ¿No tiene una cuenta?{" "}
+                                <Link to="/signup" className="text-dark font-bold">
+                                    Registrarse
                                 </Link>
                             </p>
                         </Form>

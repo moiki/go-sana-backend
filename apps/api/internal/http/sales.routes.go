@@ -23,6 +23,17 @@ func GetSalesTable(ctx *fiber.Ctx) error {
 	return nil
 }
 
+func GetSalesDashboard(ctx *fiber.Ctx) error {
+	dashboard, err := services.SalesDashboardForToday()
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+		return nil
+	}
+	ctx.JSON(fiber.Map{"data": dashboard})
+	return nil
+}
+
 func CreateSale(ctx *fiber.Ctx) error {
 	newSale := models.Sale{}.NewSale()
 	if err := ctx.BodyParser(&newSale); err != nil {
@@ -52,4 +63,5 @@ func CreateSale(ctx *fiber.Ctx) error {
 func SalesRoutes(app fiber.Router) {
 	app.Get("/sales/sales-table", middlewares.JWTProtected(), GetSalesTable)
 	app.Post("/sales/create", middlewares.JWTProtected(), CreateSale)
+	app.Get("/sales/dashboard", middlewares.JWTProtected(), GetSalesDashboard)
 }
