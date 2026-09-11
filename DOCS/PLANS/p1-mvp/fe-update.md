@@ -35,7 +35,7 @@
 2. `QueryClientProvider` + capa de datos sobre el axios de `rest.js` (interceptor cookie-refresh intacto).
 3. Queries: `['products-table', params]`, labs, providers, `['collections']`, `me`.
 4. Mutaciones: login, logout, create product/lab/presentation/provider, create sale; invalidación por query key.
-5. TS incremental en archivos tocados.
+5. TS incremental diferido a Fase D (var 2026-09-11: PR2 en JS para mantenerla revisable; conversión de archivos tocados en Vite).
 
 ## Fase C — Rebranding + antd 5
 1. antd 4 → 5: quitar `antd/dist/antd.css`, `ConfigProvider` con `colorPrimary #0F766E`, tipografía Inter, `radius`.
