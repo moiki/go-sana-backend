@@ -27,6 +27,8 @@ go run ./apps/api/cmd/sana-migrate -all   # indexes + seed (idempotent)
 docker compose up                 # mongo + api (local, uses docker-compose.yml)
 ```
 
+> Track overall progress across sessions in `PROGRESS.MD` at the repo root.
+
 Tests exist (Go `testing` + testify). Integration tests touching MongoDB are
 added in later phases — do not add Mongo-dependent tests without asking.
 
