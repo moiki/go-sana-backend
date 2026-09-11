@@ -1,14 +1,12 @@
 import {Button, Form, Input, Modal, Radio, Spin} from 'antd';
-import {useAuthorizedApi} from "../../services/auth/rest.js";
+import {useCreateMutation} from "../../services/query/api";
 import openNotificationWithIcon from "../alerts/notifications.js";
 import "../../assets/styles/modalForm.style.css"
 
 export default function ModalForm({ title, open, closeModal, url, callback, children, full }) {
     const [form] = Form.useForm();
-    const {loading, executeService} = useAuthorizedApi({
-        url: url,
-        method: "POST",
-        onSuccess:() => {
+    const mutation = useCreateMutation(url, {
+        onSuccess: () => {
             form.resetFields()
             openNotificationWithIcon("success", "Listo!", "Elemento Creado Exitosamente.")
             if (callback) {
@@ -37,14 +35,14 @@ export default function ModalForm({ title, open, closeModal, url, callback, chil
                     .validateFields()
                     .then((values) => {
                         form.resetFields();
-                        executeService(values);
+                        mutation.mutate(values);
                     })
                     .catch((info) => {
                         console.log('Validate Failed:', info);
                     });
             }}
         >
-            <Spin spinning={loading} tip={"Guardando..."} delay={500}>
+            <Spin spinning={mutation.isLoading} tip={"Guardando..."} delay={500}>
                 <Form
                     form={form}
                     layout="vertical"
@@ -56,5 +54,3 @@ export default function ModalForm({ title, open, closeModal, url, callback, chil
         </Modal>
     );
 };
-
-

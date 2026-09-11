@@ -1,9 +1,8 @@
-import React, {useContext, useEffect, useState} from "react";
-import GlobalContext, {useAuth} from "../../store/context.store.js";
-import {Navigate, Outlet, Route, Routes, useLocation, useNavigate} from "react-router-dom";
+import React, {useEffect} from "react";
+import {Navigate, Outlet, Route, Routes, useLocation} from "react-router-dom";
 import {appRoutes} from "../../services/constants/routes.js";
-import {useAuthorizedApi} from "../../services/auth/rest.js";
-import actionsStore from "../../store/actions.store.js";
+import {useMeQuery} from "../../services/query/api";
+import {useAuthStore} from "../../store/useAuthStore";
 import LoadingScreen from "../../components/loadings/loadingScreen";
 import MainLayout from "./Main.layout";
 
@@ -24,10 +23,10 @@ export const LoadContent = () => appRoutes.map((routes, index) => {
 })
 
 const RequireAuth = ({children}) => {
-    const {state} = useContext(GlobalContext);
+    const user = useAuthStore((state) => state.user);
     const location = useLocation();
 
-    if (!state.user) {
+    if (!user) {
         return (
             <Navigate
                 to={{pathname: "/login"}}
@@ -40,44 +39,29 @@ const RequireAuth = ({children}) => {
     return <>{children}</>
 };
 
-
-
 export default function AppLayout() {
-    const {dispatch} = useContext(GlobalContext);
-    const [loading, setLoading] = useState(true);
-    const hist = useNavigate()
-    const {data, error} = useAuthorizedApi({
-        url: "/me",
-        automatic: true,
-        onError: () => {
-            hist("/login")
-        }
-    });
+    const setUser = useAuthStore((state) => state.setUser);
+    const clearUser = useAuthStore((state) => state.clearUser);
+    const {data: me, isLoading, isError} = useMeQuery();
 
     useEffect(() => {
-        if (data) {
-            dispatch({
-                type: actionsStore.SET_LOGGED_USER,
-                payload: data
-            })
+        if (me) {
+            setUser(me);
         }
-        if (error) {
-            console.log("error is: ", error)
-            dispatch({
-                type: actionsStore.SET_INITIAL_STATE,
-            })
-            setLoading(false)
+    }, [me, setUser]);
+
+    useEffect(() => {
+        if (isError) {
+            clearUser();
         }
-        // console.log(user)
+    }, [isError, clearUser]);
 
-    }, [data, loading]);
-
-    if (loading === false) {
-        return <RequireAuth>
-                <MainLayout className={"container-fluid"}>
-                    <Outlet/>
-                </MainLayout>
-        </RequireAuth>
+    if (isLoading) {
+        return <LoadingScreen/>
     }
-    return <LoadingScreen verifyOff={() => setLoading(false)}/>
+    return <RequireAuth>
+        <MainLayout className={"container-fluid"}>
+            <Outlet/>
+        </MainLayout>
+    </RequireAuth>
 }

@@ -1,33 +1,34 @@
-import React from "react";
+import React, {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {
     Layout, Button, Row, Col, Typography, Form, Input, Checkbox,
 } from "antd";
 import signinbg from "../../assets/login-image.jpg";
-import {useFreeApi, setAccessToken} from "../../services/auth/rest.js";
+import {useLoginMutation} from "../../services/query/api";
 import {PulseLoader} from "react-spinners";
 
 const {Title} = Typography;
 const {Footer, Content} = Layout;
 
 export default function SignIn() {
-    let navigate = useNavigate();
-    const {error, loading, executeService} = useFreeApi(
-        '/login',
-        "POST",
-        {
-            onSuccess: ({data}) => {
-                setAccessToken(data.token);
-                navigate("/admin")
-            },
-        }
-    )
+    const navigate = useNavigate();
+    const [formError, setFormError] = useState(null);
+    const mutation = useLoginMutation({
+        onSuccess: () => {
+            navigate("/admin");
+        },
+        onError: () => {
+            setFormError("Hubo un error al iniciar sesión. Verifique sus credenciales.");
+        },
+    });
+
     const onSubmit = async (data) => {
-        await executeService({
+        setFormError(null);
+        mutation.mutate({
             email: data.email,
             password: data.password,
-            remember_me: data.remember_me || false,
-        })
+            rememberMe: data.remember_me || false,
+        });
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -43,8 +44,8 @@ export default function SignIn() {
                         md={{span: 12}}
                     >
                         <Title className="mb-15">Iniciar Sesión</Title>
-                        {error && <b className={"text-danger"}>
-                            Hubo un error al iniciar sesión. Verifique sus credenciales.</b>}
+                        {formError && <b className={"text-danger"}>
+                            {formError}</b>}
                         <Title className="font-regular text-muted" level={5}>
                             Ingrese su correo y contraseña para iniciar sesión
                         </Title>
@@ -59,19 +60,19 @@ export default function SignIn() {
                                 label="Email"
                                 name="email"
                                 rules={[{
-                                    required: true, message: "Please input your email!",
+                                    required: true, message: "Por favor ingrese su correo",
                                 },]}
                             >
                                 <Input placeholder="Email"/>
                             </Form.Item>
                             <Form.Item
-                                label="Contrasena"
+                                label="Contraseña"
                                 name="password"
                                 rules={[{
-                                    required: true, message: "Please input your password!",
+                                    required: true, message: "Por favor ingrese su contraseña",
                                 },]}
                             >
-                                <Input.Password placeholder="Password"/>
+                                <Input.Password placeholder="Contraseña"/>
                             </Form.Item>
                             <Form.Item name="remember_me" valuePropName="checked">
                                 <Checkbox>Recordarme</Checkbox>
@@ -83,7 +84,7 @@ export default function SignIn() {
                                     style={{width: "100%"}}
                                 >
                                     {
-                                        loading === true ?
+                                        mutation.isLoading ?
                                             <PulseLoader color={"white"} loading/>
                                             : "INICIAR SESIÓN"
                                     }

@@ -16,10 +16,10 @@ import EditableCell, {EditableRow} from "../../components/Editables/EditableCell
 import utilsServices, {DISCOUNT_TYPE, PARSE_TEXT} from "../../services/utils.services";
 import "../../assets/styles/customTables.styles.css"
 import saleServices, {
-    createSale,
     computeDiscountedAmount,
     buildSalePayload
 } from "../../services/sales/sales.services";
+import {useCreateSaleMutation} from "../../services/query/api";
 import openNotificationWithIcon from "../../components/alerts/notifications";
 import {SearchInput} from "./MiniSearchProduct";
 import Card from "antd/lib/card/Card";
@@ -174,26 +174,25 @@ export default function CreateSale() {
 
     const grossTotal = saleDetails.reduce((acc, d) => acc + (Number(d.subTotal) || 0), 0);
     const displayAmount = Math.round(computeDiscountedAmount(grossTotal, saleBody.DiscountType, saleBody.Discount) * 100) / 100;
-    const [submittingSale, setSubmittingSale] = useState(false);
 
-    const handleConfirmSale = async () => {
-        if (saleDetails.length === 0) {
-            openNotificationWithIcon("warning", "Venta vacía", "Agregue al menos un producto");
-            return;
-        }
-        setSubmittingSale(true);
-        try {
-            const payload = buildSalePayload(saleBody, saleDetails);
-            await createSale(payload);
+    const saleCreateMutation = useCreateSaleMutation({
+        onSuccess: () => {
             openNotificationWithIcon("success", "Venta registrada", "La venta se guardó correctamente");
             setOpenConfirm(false);
             resetSale();
             setHasDiscount(false);
-        } catch (err) {
+        },
+        onError: (err) => {
             openNotificationWithIcon("error", "Error al guardar la venta", err.message || "Intente de nuevo");
-        } finally {
-            setSubmittingSale(false);
+        },
+    });
+
+    const handleConfirmSale = () => {
+        if (saleDetails.length === 0) {
+            openNotificationWithIcon("warning", "Venta vacía", "Agregue al menos un producto");
+            return;
         }
+        saleCreateMutation.mutate(buildSalePayload(saleBody, saleDetails));
     };
 
     return <Card title={"NUEVA VENTA"} extra={<Button type={"primary"} disabled={saleDetails.length === 0} onClick={() => {
@@ -205,7 +204,7 @@ export default function CreateSale() {
             Amount={displayAmount}
             onChangePaid={changeBodyValueByObject}
             PaidWith={saleBody.PaidWith}
-            confirmLoading={submittingSale}
+            confirmLoading={saleCreateMutation.isLoading}
             onConfirm={handleConfirmSale}
             closeModal={() => setOpenConfirm(false)}
         />

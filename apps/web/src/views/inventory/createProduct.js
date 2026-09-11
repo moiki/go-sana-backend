@@ -11,7 +11,7 @@ import {
     Row,
     Select,
 } from "antd";
-import {useAuthorizedApi} from "../../services/auth/rest.js";
+import {useCreateProductMutation, useCollectionsQuery} from "../../services/query/api";
 import openNotificationWithIcon from "../../components/alerts/notifications.js";
 import {Link} from "react-router-dom";
 import "../../assets/styles/customForm.styles.css";
@@ -20,7 +20,6 @@ import CreatePresentation from "./createPresentation";
 import CreateLab from "./createLab";
 import {DollarCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import AddPrice, {PRICE_TYPE} from "./addPrice";
-import useLoadCollections from "../../services/products/loadCollections";
 
 const validatePrimeNumber = (number) => {
     // const data = Number(number.replace(/C\$\s?|(,*)/g, ''))
@@ -46,12 +45,11 @@ export default function CreateProduct() {
     const [openPresentation, setOpenPresentation] = useState(false);
     const [openAddPrice, setOpenAddPrice] = useState(false);
 
-    const {collections, loadCollection} = useLoadCollections();
-    const {presentations, laboratories, providers} = collections;
+    const {data: collections, refetch: loadCollection} = useCollectionsQuery();
+    const {presentations = [], laboratories = [], providers = []} = collections ?? {};
+
     // Post Create Product
-    const {loading, error, executeService} = useAuthorizedApi({
-        url: "/inventory/create",
-        method: "POST",
+    const mutation = useCreateProductMutation({
         onSuccess: () => {
             form.resetFields();
             openNotificationWithIcon(
@@ -71,7 +69,7 @@ export default function CreateProduct() {
             openNotificationWithIcon('error', 'Ups!', 'Necesitas agregar al menos un precio para este producto antes de registrarlo.')
             return;
         }
-        await executeService({
+        await mutation.mutateAsync({
             ...values,
             prices: pricesState
         });

@@ -1,5 +1,5 @@
-import {useEffect, useState} from "react";
-import {useAuthorizedApi} from "../../services/auth/rest.js";
+import {useMemo, useState} from "react";
+import {useTableQuery} from "../../services/query/api";
 import {Button, Card, Col, Input, Pagination, Table} from "antd";
 import {PlusCircleOutlined, SearchOutlined} from "@ant-design/icons";
 import {Link} from "react-router-dom";
@@ -38,59 +38,26 @@ const columns = [
             </b>
         ),
     },
-    // {
-    //     title: "Stock",
-    //     key: "quantity",
-    //     dataIndex: "quantity",
-    //     render: (text) => (
-    //         <b className={"success"}>
-    //             {`${text}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-    //         </b>
-    //     ),
-    // },
 ];
+
+const paramsInitialState = {perPage: 10, page: 1, filter: ""};
+
 export default function ProductsPanel() {
-    const [tableParams, setTableParams] = useState({
-        perPage: 10,
-        page: 1,
-        filter: ""
-    });
-    const [tableInventory, setTableInventory] = useState({
-        total: 0,
-        docs: [],
-    });
-    const { loading, data, executeService } = useAuthorizedApi({
-        url: `/inventory/products-table?per_page=${tableParams.perPage}&page=${tableParams.page}&filter=${tableParams.filter}`,
-        onError: (err) => {
-            console.log(err);
-        },
-    });
+    const [tableParams, setTableParams] = useState(paramsInitialState);
+    const {data, isLoading: loading} = useTableQuery('/inventory/products-table', tableParams);
 
-    const searchProduct = element => {
-        // console.log(element)
-        setTableParams({...tableParams, filter: element})
-    }
-
-    useEffect(() => {
-        if (data?.data) {
-            const newState = data?.data?.shift();
-            const tableState = {
-                ...newState,
-                docs: newState.docs.map(item => {
-                    return {
-                        ...item,
-                        price: item.prices.find(p => p.type === PRICE_TYPE.UNIT)?.amount || 0
-                    }
-                })
-            }
-            setTableInventory(tableState);
-        }
+    const tableInventory = useMemo(() => {
+        if (!data) return {total: 0, docs: []};
+        return {
+            total: data.total,
+            docs: data.docs.map(item => ({
+                ...item,
+                price: item.prices.find(p => p.type === PRICE_TYPE.UNIT)?.amount || 0,
+            })),
+        };
     }, [data]);
 
-    useEffect(() => {
-        executeService()
-    }, [tableParams]);
-
+    const searchProduct = (element) => setTableParams(p => ({...p, filter: element}));
 
     return (
         <div className="tabled">
@@ -108,9 +75,7 @@ export default function ProductsPanel() {
                                     onSearch={searchProduct}
                                     prefix={<SearchOutlined/>}
                                 />
-                                <Link
-                                    to={"/admin/inventario/crear"}
-                                >
+                                <Link to={"/admin/inventario/crear"}>
                                     <Button type={"primary"} style={{borderRadius: 0}}>
                                         <PlusCircleOutlined />
                                         Add Product
@@ -136,11 +101,11 @@ export default function ProductsPanel() {
                                     justifyContent: "space-between",
                                 }}
                             >
-                                <h6>Total: {tableInventory.total}</h6>{" "}
+                                <h6>Total: {tableInventory.total}</h6>
                                 <Pagination
                                     current={tableParams.page}
                                     pageSize={tableParams.perPage}
-                                    onChange={(page) => setTableParams({...tableParams, page})}
+                                    onChange={(page) => setTableParams(p => ({...p, page}))}
                                     size="small"
                                     total={tableInventory.total}
                                 />

@@ -1,30 +1,29 @@
-import {useReducer} from "react";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import './App.css';
 import "antd/dist/antd.css"
 import "./assets/styles/main.styles.css";
 import "./assets/styles/responsive.styles.css";
-import GlobalContext, {initialState} from "./store/context.store";
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import AuthLayout from "./layout/auth/auth.layout";
 import Login from "./layout/auth/Login.auth.js";
 import Signup from "./components/forms/signup/signup";
 import AppLayout, {LoadContent} from "./layout/app/app.layout";
-import reducer from "./store/reducer.store.js";
 import ErrorBoundary from "./components/errors/ErrorBoundary";
 
-function init(state) {
-  return state
-}
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 1,
+            refetchOnWindowFocus: false,
+            staleTime: 30_000,
+        },
+    },
+});
 
 function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-
   return (
       <ErrorBoundary>
-      <GlobalContext.Provider value={{
-        state: state,
-        dispatch: dispatch,
-      }}>
+      <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>
             <Route path="login" element={<Login/>}/>
@@ -40,7 +39,7 @@ function App() {
             />
           </Routes>
         </BrowserRouter>
-      </GlobalContext.Provider>
+      </QueryClientProvider>
       </ErrorBoundary>
 
   )
