@@ -13,6 +13,7 @@ git history.
 ## Commands
 
 ```bash
+./dev.sh                        # run API + web locally WITHOUT Docker (Ctrl+C stops both)
 go build ./apps/api/...   # compile the API module (workspace root)
 go vet ./apps/api/...     # static analysis (expected pre-existing warnings remain)
 gofmt -l apps/api          # list unformatted files
