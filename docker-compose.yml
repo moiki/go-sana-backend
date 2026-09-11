@@ -1,0 +1,44 @@
+name: sana
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  api:
+    build: ./apps/api
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      PORT: "9000"
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DB: sana
+      DEF_USER: admin@example.com
+      DEF_PASS: change-me
+      JWT_SECRET: local-dev-secret-change-me
+      JWT_REFRESH_SECRET: local-dev-refresh-change-me
+      COOKIE_SECURE: "false"
+      LOG_LEVEL: debug
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  mongo-data:

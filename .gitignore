@@ -51,3 +51,8 @@ builds/**/images/*
 # security / ssl
 *.pem
 *.xxjson
+
+# web
+apps/web/node_modules/
+apps/web/dist/
+apps/web/*.local
