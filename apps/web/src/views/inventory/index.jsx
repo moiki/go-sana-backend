@@ -3,7 +3,7 @@ import {
     Card,
     Tabs,
 } from "antd";
-import ProductsPanel from "./ProductsPanel.js";
+import ProductsPanel from "./ProductsPanel.jsx";
 import LaboratoriesPanel from "./LaboratoriesPanel";
 
 const TabsViews = [

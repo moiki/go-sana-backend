@@ -1,13 +1,17 @@
 import {
-    Button, Checkbox,
+    Button,
+    Card,
+    Checkbox,
     Col,
     Form,
-    Input, InputNumber,
+    Input,
+    InputNumber,
     Popconfirm,
-    Row, Select,
+    Row,
+    Select,
     Space,
     Table,
-    Tooltip
+    Tooltip,
 } from "antd";
 import {DeleteOutlined} from "@ant-design/icons";
 import React, {useState} from "react";
@@ -22,7 +26,6 @@ import saleServices, {
 import {useCreateSaleMutation} from "../../services/query/api";
 import openNotificationWithIcon from "../../components/alerts/notifications";
 import {SearchInput} from "./MiniSearchProduct";
-import Card from "antd/lib/card/Card";
 import {debounce} from "lodash";
 import ConfirmSale from "./confirmSale";
 import {PRICE_TYPE} from "../inventory/addPrice";

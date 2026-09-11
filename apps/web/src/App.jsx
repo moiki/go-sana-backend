@@ -8,7 +8,7 @@ import "./assets/styles/main.styles.css";
 import "./assets/styles/responsive.styles.css";
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import AuthLayout from "./layout/auth/auth.layout";
-import Login from "./layout/auth/Login.auth.js";
+import Login from "./layout/auth/Login.auth.jsx";
 import Signup from "./components/forms/signup/signup";
 import AppLayout, {LoadContent} from "./layout/app/app.layout";
 import ErrorBoundary from "./components/errors/ErrorBoundary";

@@ -50,6 +50,12 @@
 3. TS: tsconfig `allowJs`, archivos tocados → TS.
 4. PWA: `vite-plugin-pwa`, manifest Sana, íconos 192/512, `autoUpdate`, precache shell → offline a login.
 
+## Fase D — notas de implementación (2026-09-11)
+- JSX y archivos `.js` con JSX se renombraron a `.jsx` (Vite 6 no parsea JSX en `.js`, a diferencia de CRA). Imports locales se actualizaron a `.jsx` o extensionless.
+- `vitest` lee `vitest.config.js` (no `vite.config.js`): la config de test es independiente.
+- `vite-plugin-pwa` requiere devDeps peer `workbox-build`/`workbox-window` ^7.3.
+- Íconos PWA 192/512: rasterizados con generador propio (Node/zlib) porque `sips` no renderiza `<text>`/paths de SVG como PNG de forma fiable. Fuente: `src/assets/sana-logo.svg`.
+
 ## Verificación
 `go build ./apps/api/...`, `go vet ./apps/api/...`, `pnpm -C apps/web build`, smoke manual (login → venta → inventario → logout), CI verde por PR.
 
@@ -57,4 +63,4 @@
 - [x] Fase A (PR1) — commit `47043ec`
 - [x] Fase B (PR2) — commit `1a991e4`
 - [x] Fase C (PR3) — commit `c8e2ffd`
-- [ ] Fase D (PR4)
+- [x] Fase D (PR4) — pendiente de commit

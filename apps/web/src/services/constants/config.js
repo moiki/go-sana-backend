@@ -1,5 +1,5 @@
 export default {
-    rest_uri_prod: process.env.REACT_APP_REST_DEV_URL,
-    rest_uri_dev: process.env.REACT_APP_REST_DEV_URL,
-    node_env: process.env.NODE_ENV
+    rest_uri_prod: import.meta.env.VITE_API_URL,
+    rest_uri_dev: import.meta.env.VITE_API_URL,
+    node_env: import.meta.env.PROD ? "production" : "development",
 }

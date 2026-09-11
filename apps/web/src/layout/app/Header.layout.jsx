@@ -36,7 +36,7 @@ import {
 
 import {NavLink, Link, useNavigate} from "react-router-dom";
 import styled from "styled-components";
-import {useAuthStore} from "../../store/useAuthStore.js";
+import {useAuthStore} from "../../store/useAuthStore";
 import {useQueryClient} from "@tanstack/react-query";
 import {logout} from "../../services/auth/login.js";
 

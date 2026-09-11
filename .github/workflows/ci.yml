@@ -28,7 +28,7 @@ jobs:
         run: go test ./apps/api/...
 
   web:
-    name: web (build - CRA + antd)
+    name: web (test + build - Vite + antd + PWA)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -44,5 +44,7 @@ jobs:
         run: corepack enable
       - name: Install
         run: pnpm install --frozen-lockfile
+      - name: Test
+        run: pnpm test
       - name: Build
         run: pnpm build
