@@ -54,7 +54,7 @@
 `go build ./apps/api/...`, `go vet ./apps/api/...`, `pnpm -C apps/web build`, smoke manual (login → venta → inventario → logout), CI verde por PR.
 
 ## Estado
-- [ ] Fase A (PR1)
-- [ ] Fase B (PR2)
+- [x] Fase A (PR1) — commit `47043ec`
+- [x] Fase B (PR2) — commit `1a991e4`
 - [ ] Fase C (PR3)
 - [ ] Fase D (PR4)
