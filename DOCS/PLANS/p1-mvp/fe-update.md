@@ -56,5 +56,5 @@
 ## Estado
 - [x] Fase A (PR1) — commit `47043ec`
 - [x] Fase B (PR2) — commit `1a991e4`
-- [x] Fase C (PR3) — commits pendientes
+- [x] Fase C (PR3) — commit `c8e2ffd`
 - [ ] Fase D (PR4)
